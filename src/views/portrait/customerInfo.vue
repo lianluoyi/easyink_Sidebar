@@ -180,11 +180,11 @@ export default {
             break;
           }
           case '邮箱': {
-            newItem.value = customerInfo?.email;
+            newItem.value = customerInfo && customerInfo.email;
             break;
           }
           case '地址': {
-            newItem.value = customerInfo?.address;
+            newItem.value = customerInfo && customerInfo.address;
             break;
           }
           case '电话': {
@@ -207,7 +207,7 @@ export default {
         case CUSTOMER_PROPERTY_VALUE['singleText']:
         case CUSTOMER_PROPERTY_VALUE['mulText']:
         case CUSTOMER_PROPERTY_VALUE['dateField']: {
-          newItem.value = this.dealShowText(customItem, customerInfo, 'textType')?.value;
+          newItem.value = this.dealShowText(customItem, customerInfo, 'textType') && this.dealShowText(customItem, customerInfo, 'textType').value;
           break;
         }
         case CUSTOMER_PROPERTY_VALUE['singleRadio']:
