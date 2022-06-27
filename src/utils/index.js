@@ -57,7 +57,7 @@ export function matchDealtagName(tagList, store) {
   const allTagObj = store.state.materialInfo && store.state.materialInfo.allTagObj;
   const newList = [];
   tagList.map(item => {
-    newList.push({ ...item, tagName: allTagObj[item.materialTagId]?.tagName });
+    newList.push({ ...item, tagName: allTagObj[item.materialTagId] && allTagObj[item.materialTagId].tagName });
   });
   return newList;
 }
@@ -210,7 +210,7 @@ export function isMac() {
  * @returns
  */
 export function isWxWork() {
-  return /wxwork/i.test(navigator.userAgent?.toLowerCase());
+  return /wxwork/i.test(navigator.userAgent && navigator.userAgent.toLowerCase());
 }
 
 /**
