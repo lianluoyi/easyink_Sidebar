@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户/客户群标签弹窗
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <!-- 点击客户标签里的编辑触发弹出框开始 -->
@@ -112,6 +112,10 @@ export default {
     oldTagList: {
       type: Array,
       default: () => []
+    },
+    isRadar: {
+      type: Boolean,
+      default: false
     }
   },
   inject: ['findTrajectory'],
@@ -158,11 +162,19 @@ export default {
       });
       // 数组里不存在该对象,则添加
       if (index === -1) {
-        this.addTag.push({
-          groupId: item.groupId,
-          name: item.name,
-          tagId: item.tagId
-        });
+        if (this.isRadar) {
+          this.addTag.push({
+            groupId: item.groupId,
+            tagName: item.name,
+            tagId: item.tagId
+          });
+        } else {
+          this.addTag.push({
+            groupId: item.groupId,
+            name: item.name,
+            tagId: item.tagId
+          });
+        }
       } else {
         // 数组里存在该对象,则删除
         this.addTag.splice(index, 1);
@@ -172,6 +184,12 @@ export default {
      * 点击保存
      */
     saveInfo() {
+      if (this.isRadar) {
+        this.$emit('update:addTag', this.addTag);
+        this.Pshow = false;
+        this.addTag = [];
+        return;
+      }
       switch (this.portraitType) {
         case 'customer': {
           // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]

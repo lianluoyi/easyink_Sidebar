@@ -1,4 +1,4 @@
-import { ICON_LIST, MEDIA_TYPE, DEFAULT_IMG, WX_TYPE, CORP_TYPE, TWO_DIGITS, MS_TO_SECONDS } from './constants';
+import { ICON_LIST, MEDIA_TYPE, DEFAULT_IMG, WX_TYPE, CORP_TYPE, TWO_DIGITS, MS_TO_SECONDS, NUMBER_UNIT } from './constants';
 import moment from 'moment';
 
 const MAX_BYTE = 1024;
@@ -57,7 +57,7 @@ export function matchDealtagName(tagList, store) {
   const allTagObj = store.state.materialInfo && store.state.materialInfo.allTagObj;
   const newList = [];
   tagList.map(item => {
-    newList.push({ ...item, tagName: allTagObj[item.materialTagId] && allTagObj[item.materialTagId].tagName });
+    newList.push({ ...item, tagName: allTagObj[item.materialTagId]?.tagName });
   });
   return newList;
 }
@@ -210,7 +210,7 @@ export function isMac() {
  * @returns
  */
 export function isWxWork() {
-  return /wxwork/i.test(navigator.userAgent && navigator.userAgent.toLowerCase());
+  return /wxwork/i.test(navigator.userAgent?.toLowerCase());
 }
 
 /**
@@ -357,7 +357,7 @@ function dealOverSizeVideo(mes, data, msgtype) {
  * @param {*} enterChat 为true时表示发送完成之后顺便进入会话，仅移动端3.1.10及以上版本支持该字段
  * @returns
  */
-export function sendMessage(data, _this, getMaterialMediaId, enterChat = false) {
+export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterChat = false) {
   return new Promise((resolve, reject) => {
     let flag = false;
     let entry;
@@ -685,4 +685,33 @@ export function diffHour(dateStart, dateEnd) {
   const endDate = moment(dateEnd, 'YYYY-MM-DD HH:mm:ss');
   const hours = endDate.diff(startDate, 'hours');
   return hours;
+}
+
+/**
+ * @description: 数值转K / 万 四舍五入保留一位小数
+ * @param {*} num
+ * @return {*}
+ */
+export function formatNumber(num) {
+  return num >= NUMBER_UNIT.K && num < NUMBER_UNIT.W
+    ? (num / NUMBER_UNIT.K).toFixed(1) + 'k' : num >= NUMBER_UNIT.W
+      ? (num / NUMBER_UNIT.W).toFixed(1) + '万' : num;
+}
+
+/**
+ * @description: 获取今天时间的格式化
+ * @param {*} time
+ * @return {*}
+ */
+export function returnTodayFormat(pattern) {
+  return moment().format(pattern);
+}
+
+/**
+ * @description: 获取N天后的时间的格式化
+ * @param {*} time
+ * @return {*}
+ */
+export function returnAfterNDayFormat(pattern, n = 1) {
+  return moment().add(n, 'd').format(pattern);
 }

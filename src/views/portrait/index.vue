@@ -355,7 +355,7 @@ export default {
      * 年龄根据出生日期是否启用来决定是否显示
      */
     showAge() {
-      return this.$store.state.customerProperty && this.$store.state.customerProperty.customerProperList.findIndex(item => item.name === '出生日期') > -1;
+      return this.$store.state.customerProperty?.customerProperList.findIndex(item => item.name === '出生日期') > -1;
     }
   },
   watch: {

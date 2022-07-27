@@ -145,7 +145,7 @@ export default {
       const allList = [...this.properList];
       const requiredIndex = allList.findIndex(item => {
         if ([CUSTOMER_PROPERTY_VALUE['img'], CUSTOMER_PROPERTY_VALUE['file'], CUSTOMER_PROPERTY_VALUE['mulRadio']].includes(item.type)) {
-          return item.required && ((item.value && !item.value.length) && (item && item.optionValue && !item.optionValue.length));
+          return item.required && (!item.value?.length && !item?.optionValue?.length);
         } else {
           return item.required && (!item.value && !item.optionValue);
         }

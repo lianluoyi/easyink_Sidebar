@@ -1,6 +1,6 @@
 <!--
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="verbal-trick-content-div">
@@ -85,7 +85,7 @@
         :input-value.sync="groupName"
         maxlength="12"
         label-width="0"
-        placeholder="请填写分组名称"
+        placeholder="请填写渠道名称,方便标记使用"
       />
     </BottomPopup>
   </div>
