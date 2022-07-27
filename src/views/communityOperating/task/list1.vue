@@ -83,10 +83,8 @@ export default {
     getTasks() {
       this.loading = true;
       getTasks(this.$store.state.userId, this.taskType).then((res) => {
-        // if (res.code === 200) {
         this.todo = res.todo || [];
         this.done = res.done || [];
-        // }
         this.loading = false;
       }).catch((error) => {
         if (error) console.error(error);

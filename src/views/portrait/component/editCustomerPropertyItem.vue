@@ -299,7 +299,7 @@ export default {
      */
     removeFile(index, fileIndex) {
       const properList = [...this.properList];
-      const fileList = (properList[index] && properList[index].value) || [];
+      const fileList = properList[index]?.value || [];
       fileList.splice(fileIndex, 1);
       properList[index]['value'] = fileList;
       this.$emit('update:properList', properList);
@@ -332,7 +332,7 @@ export default {
      */
     deleteImg(params, index) {
       const properList = [...this.properList];
-      const imgList = (properList[index] && [...properList[index].value]) || [];
+      const imgList = [...properList[index]?.value] || [];
       const imgIndex = imgList.findIndex(item => item === params.url);
       if (imgIndex > -1) imgList.splice(imgIndex, 1);
       properList[index]['value'] = imgList;

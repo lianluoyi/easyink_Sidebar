@@ -113,7 +113,7 @@ export default {
   },
   computed: {
     selectedUserName() {
-      return this.list[this.selectedUser] && this.list[this.selectedUser].userName;
+      return this.list[this.selectedUser]?.userName;
     },
     showList() {
       return this.list;
@@ -155,7 +155,7 @@ export default {
     },
     async getTree() {
       // 没有部门数据时才去获取
-      if (this.query.departments && this.query.departments.length) return;
+      if (this.query.departments?.length) return;
 
       try {
         const { data } = await getTree();
@@ -163,7 +163,7 @@ export default {
         this.scopeDeptList = data.filter(ele => ele.enable);
         this.treeData = this.handleTree(this.scopeDeptList);
         this.treeMap = this.getDeptMap(data);
-        this.query.departments = this.dealScopedDepts((this.scopeDeptList[0] && (this.scopeDeptList[0].id) || '')).join(',');
+        this.query.departments = this.dealScopedDepts(this.scopeDeptList[0]?.id ?? '').join(',');
       } catch (error) {
         this.scopeDeptList = [];
         this.treeData = [];

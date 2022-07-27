@@ -1,7 +1,7 @@
 /*
  * @Description: 公共常量
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
  */
 
 // 接口请求成功状态码
@@ -247,3 +247,38 @@ export const ORDERTYPE_TEXT = {
 // 链接标题摘要最大限制的长度
 export const LINK_TITLE_MAXLENGTH = 16; // 标题最大长度16
 export const LINK_CONTENT_MAXLENGTH = 64; // 摘要最大长度64
+
+// 企业雷达
+const ENTERPRISE_RADAR = 3;
+// 部门雷达
+const DEPARTMENT_RADAR = 2;
+// 我的雷达
+const PERSONAL_RADAR = 1;
+
+// 雷达类型
+export const RADAR_TYPE = {
+  'enterprise': ENTERPRISE_RADAR,
+  'department': DEPARTMENT_RADAR,
+  'personal': PERSONAL_RADAR
+};
+
+// 素材库
+export const MATERIAL_TYPE = 'material';
+// 话术库
+export const WORDS_TYPE = 'words';
+// 雷达库
+export const RADARS_TYPE = 'radars';
+
+// 时间选择类型
+export const TIME_CHECKED_TYPE = {
+  TODAY: '1',
+  ALL: '2'
+};
+
+// 数值单位
+export const NUMBER_UNIT = {
+  // eslint-disable-next-line no-magic-numbers
+  K: 1e3,
+  // eslint-disable-next-line no-magic-numbers
+  W: 1e4
+};

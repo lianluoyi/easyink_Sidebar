@@ -1,7 +1,7 @@
 <!--
  * @Description: 底部弹出层
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <van-popup
@@ -19,8 +19,8 @@
       <van-button size="small" type="default" @click="cancelPopup">
         取 消
       </van-button>
-      <van-button color="#6BB4AB" size="small" type="primary" @click="confirmPopup">
-        保 存
+      <van-button color="#6BB4AB" :style="okButtonSize && { width:`${okButtonSize}px`}" size="small" type="primary" @click="confirmPopup">
+        {{ okButton }}
       </van-button>
     </div>
   </van-popup>
@@ -45,6 +45,14 @@ export default {
     visible: {
       type: Boolean,
       default: false
+    },
+    okButton: {
+      type: String,
+      default: '保 存'
+    },
+    okButtonSize: {
+      type: Number,
+      default: 0
     }
   },
   data() {
