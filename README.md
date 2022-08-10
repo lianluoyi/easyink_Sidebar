@@ -1,19 +1,19 @@
-### easyWeCom操作手册
+### easyink操作手册
 
 [自建应用操作手册](https://www.yuque.com/docs/share/9217b462-a4c2-4d4a-97cb-48eebf800784?#hsf4v)
 
 [第三方应用操作手册](https://www.yuque.com/docs/share/591b5dff-f705-413e-b167-e8ef72d519bf?#O35E2)
 
 ### :rocket: 项目介绍
-该项目为easyWeCom的前端模块之一，负责企微客户端中的侧边栏界面展示（包含侧边栏素材库、话术库、客户画像、SOP任务详情展示等）
+该项目为easyink的前端模块之一，负责企微客户端中的侧边栏界面展示（包含侧边栏素材库、话术库、客户画像、SOP任务详情展示等）
 
 ### :factory: 关联项目
 
 | 项目名                          | 项目说明                                                    | 项目地址                                               |
 | ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------ |
-| easyWeCom_System                | easyWeCom后端服务                                           | https://github.com/easywecom/easyWeCom_System.git      |
-| easyWeCom_Dashboard             | easyWeCom前端服务，主要负责后台UI界面展示                   | https://github.com/easywecom/easyWeCom_Dashboard.git   |
-| **easyWeCom_Sidebar(当前项目)** | **easyWeCom前端服务，主要负责企微客户端中的侧边栏界面展示** | **https://github.com/easywecom/easyWeCom_Sidebar.git** |
+| easyink_System                | easyink后端服务                                           | https://github.com/easyink/easyink_System.git      |
+| easyink_Dashboard             | easyink前端服务，主要负责后台UI界面展示                   | https://github.com/easyink/easyink_Dashboard.git   |
+| **easyink_Sidebar(当前项目)** | **easyink前端服务，主要负责企微客户端中的侧边栏界面展示** | **https://github.com/easyink/easyink_Sidebar.git** |
 
 
 

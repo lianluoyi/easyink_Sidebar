@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2881475 */
-  src: url('iconfont.woff2?t=1658410630913') format('woff2'),
-       url('iconfont.woff?t=1658410630913') format('woff'),
-       url('iconfont.ttf?t=1658410630913') format('truetype');
+  src: url('iconfont.woff2?t=1659491636253') format('woff2'),
+       url('iconfont.woff?t=1659491636253') format('woff'),
+       url('iconfont.ttf?t=1659491636253') format('truetype');
 }
 
 .iconfont {
@@ -97,7 +97,7 @@
   content: "\e659";
 }
 
-.icon-word:before {
+.icon-doc:before {
   content: "\e65a";
 }
 

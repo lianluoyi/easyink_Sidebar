@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="logo ac">EasyWeCom</div>
+    <div class="logo ac">EasyInk</div>
     <router-link
       v-for="(item, index) in $router.options.routes"
       :key="index"

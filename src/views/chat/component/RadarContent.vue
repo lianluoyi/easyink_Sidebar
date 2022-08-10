@@ -31,7 +31,7 @@
           @load="getList()"
         >
           <div class="all-radar-list">
-            <RadarItem v-for="(item, index) of radarData" :key="index" :item="item" :type="type" :can-manage="canManage" @changeRadar="redactRadar" @delete="deleteRadar" />
+            <RadarItem v-for="(item, index) of radarData" :key="index" :item="item" :type="type" :can-manage="isPC()" @changeRadar="redactRadar" @delete="deleteRadar" />
           </div>
         </van-list>
       </van-pull-refresh>

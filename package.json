@@ -1,7 +1,7 @@
 {
-  "name": "easyWeCom",
+  "name": "EasyInk",
   "version": "0.1.0",
-  "description": "EasyWeCom mobile",
+  "description": "EasyInk mobile",
   "license": "GPL-3.0",
   "scripts": {
     "serve": "vue-cli-service serve",
