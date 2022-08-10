@@ -92,6 +92,7 @@
     </EmptyDefaultIcon>
     <van-popup
       v-model="showRecord"
+      class="popup-wrap"
       closeable
       position="bottom"
       :style="{ height: '75%' }"
@@ -469,11 +470,19 @@ export default {
         }
       }
     }
-    .popup-title {
-      font-size: 16px;
-      padding: 20px;
+    .popup-wrap{
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      .popup-title {
+        font-size: 16px;
+        padding: 20px;
+      }
+      .popup-content{
+        flex: 1;
+        overflow-y: scroll;
+      }
     }
-
     .van-step__title{
       h3{
         color: #101010;
