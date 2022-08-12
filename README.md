@@ -11,9 +11,9 @@
 
 | 项目名                          | 项目说明                                                    | 项目地址                                               |
 | ------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------ |
-| easyink_System                | easyink后端服务                                           | https://github.com/easyink/easyink_System.git      |
-| easyink_Dashboard             | easyink前端服务，主要负责后台UI界面展示                   | https://github.com/easyink/easyink_Dashboard.git   |
-| **easyink_Sidebar(当前项目)** | **easyink前端服务，主要负责企微客户端中的侧边栏界面展示** | **https://github.com/easyink/easyink_Sidebar.git** |
+| easyink_System                | easyink后端服务                                           | https://github.com/lianluoyi/easyink_System.git      |
+| easyink_Dashboard             | easyink前端服务，主要负责后台UI界面展示                   | https://github.com/lianluoyi/easyink_Dashboard.git   |
+| **easyink_Sidebar(当前项目)** | **easyink前端服务，主要负责企微客户端中的侧边栏界面展示** | **https://github.com/lianluoyi/easyink_Sidebar.git** |
 
 
 
@@ -25,7 +25,7 @@
 
 - 该环境采用第三方应用+代开发应用模式，可借助[第三方应用操作手册](https://www.yuque.com/docs/share/591b5dff-f705-413e-b167-e8ef72d519bf?#O35E2)辅助体验
 
-- [单租户体验入口](http://119.91.63.136:8091)
+- [单租户体验入口](http://119.91.63.136:8091)  账号密码：admin/easyink2021
 
 - 该环境采用自建应用模式，可借助[自建应用操作手册](https://www.yuque.com/docs/share/9217b462-a4c2-4d4a-97cb-48eebf800784?#hsf4v)辅助体验
 
@@ -33,10 +33,10 @@
 
 ```
 # 克隆项目
-git clone https://sup.wx95.net:9990/WeComSCRM/WeComSCRM_Sidebar.git
+git clone https://github.com/lianluoyi/easyink_Sidebar.git
 
 # 进入项目目录
-cd WeComSCRM_Sidebar
+cd easyink_Sidebar
 
 # 安装依赖
 npm install
