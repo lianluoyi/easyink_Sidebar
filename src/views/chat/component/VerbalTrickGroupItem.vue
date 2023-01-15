@@ -1,6 +1,6 @@
 <!--
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="group-item">
@@ -186,7 +186,7 @@ export default {
   },
   created() {},
   mounted() {
-    this.lowerGroupList = this.item.children ? [...this.item.children] || [] : [];
+    this.lowerGroupList = this.item.children ? [...this.item.children] : [];
     this.editGroupName = this.item.name;
   },
   methods: {
@@ -275,7 +275,7 @@ export default {
      * 编辑分组
      */
     editGroup() {
-      this.lowerGroupList = this.item.children ? [...this.item.children] || [] : [];
+      this.lowerGroupList = this.item.children ? [...this.item.children] : [];
       this.showEditGroup = true;
     },
     /**

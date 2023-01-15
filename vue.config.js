@@ -13,7 +13,8 @@ process.env.VUE_APP_TITLE = require('./package.json').description;
 // 如果您的应用程序部署在子路径中，则需要在这指定子路径
 // 例如：https://www.my-app.com/my-app/
 // 需要将它改为'/my-app/'
-const BASE_URL = process.env.NODE_ENV === 'development' ? '/' : '/';
+// process.env.NODE_ENV === 'development' ? '/'
+const BASE_URL = '/';
 
 module.exports = {
   publicPath: BASE_URL,
@@ -80,7 +81,7 @@ module.exports = {
       }
     ]);
 
-    config.when(process.env.NODE_ENV !== 'development', (config) => {
+    config.when(process.env.NODE_ENV !== 'development', () => {
       config
         .plugin('ScriptExtHtmlWebpackPlugin')
         .after('html')

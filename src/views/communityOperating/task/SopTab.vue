@@ -1,7 +1,7 @@
 <!--
  * @Description: sop每个类型的界面
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: xulinbin
 -->
 <template>
   <div class="task-tab-div">
@@ -76,7 +76,7 @@ export default {
       sopTaskDetailByUserId(userId, { ...this.query, type: this.type, isFinish: this.hasDeal ? false : null }).then(res => {
         this.loading = false;
         if (res) {
-          this.taskList = pageNum === 1 ? [...res.rows] : ([...this.taskList, ...res.rows] || []);
+          this.taskList = pageNum === 1 ? [...res.rows] : [...this.taskList, ...res.rows];
           this.finished = this.taskList.length >= res.total;
           this.total = res.total;
         }

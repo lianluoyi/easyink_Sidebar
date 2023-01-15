@@ -188,7 +188,7 @@ export default {
       wx.invoke('shareToExternalChat', params, function(res) {
         if (res.err_msg === 'shareToExternalChat:ok') {
           console.log(res);
-          changeStatus(userId, taskId, 1).then((res) => {
+          changeStatus(userId, taskId, 1).then(() => {
             this.$emit('refresh');
           }).catch(() => {
             this.$emit('refresh');

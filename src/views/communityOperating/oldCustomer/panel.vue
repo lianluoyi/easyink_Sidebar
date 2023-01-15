@@ -191,7 +191,7 @@ export default {
           }
         ] }, function(res) {
         if (res.err_msg === 'shareToExternalContact:ok') {
-          changeStatus(userId, taskId, 0).then((res) => {
+          changeStatus(userId, taskId, 0).then(() => {
             _this.$emit('refresh');
           }).catch(() => {
             _this.$emit('refresh');
