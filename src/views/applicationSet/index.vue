@@ -1,7 +1,7 @@
 <!--
  * @Description: 应用工具界面
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="app-tool-page">
@@ -150,7 +150,7 @@ export default {
         const index = this.appList.findIndex(item => item.appid === appItem);
         if (index > -1) tabList.push(this.appList[index]);
       });
-      if (tabList && tabList.length > 0) localStorage.setItem('tabList', JSON.stringify(tabList));
+      if (tabList.length > 0) localStorage.setItem('tabList', JSON.stringify(tabList));
       this.tabList = tabList;
     },
     /**

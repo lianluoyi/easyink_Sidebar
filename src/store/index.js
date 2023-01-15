@@ -1,13 +1,13 @@
 /*
  * @Description:
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
  */
 import Vue from 'vue';
 import Vuex from 'vuex';
 import getters from './getters';
 import materialInfo from './modules/materialInfo';
-import customerProperty from './modules/customerProperty';
+import customerProperty from './modules/customerPropertyList';
 import radarData from './modules/radarData';
 
 Vue.use(Vuex);

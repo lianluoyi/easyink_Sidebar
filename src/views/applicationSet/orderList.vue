@@ -1,7 +1,7 @@
 <!--
  * @Description: 订单列表
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="list-content">
@@ -138,7 +138,7 @@ export default {
         this.$parent.loading = false;
         const resData = { ...res.data };
         this.finished = resData.orderList.length === 0 || res.total <= this.orderList.length;
-        if (resData) {
+        if (Object.keys(resData).length) {
           this.orderList = newParams.page === 1 ? [...resData.orderList] : [...this.orderList, ...resData.orderList];
         }
       });

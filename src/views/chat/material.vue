@@ -1,7 +1,7 @@
 <!--
  * @Description: 素材库
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <script>
 import { getTypeList } from '@/api/chat';
@@ -58,7 +58,7 @@ export default {
     tabObj() {
       const obj = {};
       const newList = [...this.list];
-      newList.map(item => {
+      newList.forEach(item => {
         obj[item.mediaType] = item.name;
       });
       return obj;
