@@ -3,6 +3,8 @@ import { getUserInfo, getCorpInfo, getAgentTicket } from '@/api/common';
 import { param2Obj, isWxWork } from '@/utils/index';
 import { SUCCESS_CODE } from '@/utils/constants';
 import { setToken } from '@/utils/auth';
+import '@/assets/styles/index.less';
+import '@/assets/fonts/iconfont.css';
 const TIP_DURATION = 2000;
 
 export default {

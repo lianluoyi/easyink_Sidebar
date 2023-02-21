@@ -1,7 +1,7 @@
 <!--
  * @Description: 上传组件
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: xulinbin
 -->
 <template>
   <van-uploader
@@ -126,6 +126,8 @@ export default {
       form.append('mediaType', this.mediaType);
       if (this.customFileName) {
         form.append('fileName', newFileName);
+      } else {
+        form.append('fileName', file.name);
       }
       uploadFile2Cos(form).then(res => {
         // 自行处理各种情况

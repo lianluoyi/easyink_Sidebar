@@ -14,6 +14,13 @@
       wrapable
       text="移动端暂不支持编辑雷达，请前往PC端操作"
     />
+    <van-notice-bar
+      v-if="type === RADAR_TYPE['personal'] && isPC() && !offAccountList.length"
+      class="notice-div"
+      left-icon="bell"
+      wrapable
+      text="请联系管理员配置公众号后，方可添加雷达"
+    />
     <div v-if="canManage" class="add-radar" @click="addRadar"><van-icon name="add-o" />添加雷达</div>
 
     <EmptyDefaultIcon class="radar-list-empty" :length="radarData.length" text="暂无数据">
@@ -66,6 +73,7 @@
 </template>
 <script>
 import { getRadarList } from '@/api/radar';
+import { getConfig } from '@/api/wechatopen';
 import { RADAR_TYPE } from '@/utils/constants';
 import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import { PAGE_LIMIT } from '@/utils/constants';
@@ -114,7 +122,9 @@ export default {
         pageNum: 1,
         searchTitle: ''
       },
-      RADAR_TYPE
+      RADAR_TYPE,
+      // 公众号列表
+      offAccountList: []
     };
   },
   computed: {
@@ -123,15 +133,17 @@ export default {
      * 能否管理雷达
      */
     canManage() {
-      return this.type === RADAR_TYPE['personal'] && this.isPC();
+      return this.type === RADAR_TYPE['personal'] && this.isPC() && this.offAccountList?.length;
     },
     userId() {
       return this.$store.state.userId;
     }
   },
   watch: {},
-  created() {
+  async created() {
     this.getRadar();
+    const { data } = await getConfig({});
+    data ? this.offAccountList = data : null;
   },
   methods: {
     /**

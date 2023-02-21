@@ -16,7 +16,8 @@ const config = {
 
 config.services = {
   wecom: '/wecom',
-  common: '/common'
+  common: '/common',
+  wechatopen: '/wechatopen'
 };
 
 export default config;
