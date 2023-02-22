@@ -1,0 +1,171 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2881475 */
+  src: url('iconfont.woff2?t=1673763487230') format('woff2'),
+       url('iconfont.woff?t=1673763487230') format('woff'),
+       url('iconfont.ttf?t=1673763487230') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-formMenu:before {
+  content: "\e601";
+}
+
+.icon-questionnaire:before {
+  content: "\e603";
+}
+
+.icon-form-menu:before {
+  content: "\e600";
+}
+
+.icon-radar:before {
+  content: "\e640";
+}
+
+.icon-exclamation-point:before {
+  content: "\e8ed";
+}
+
+.icon-setting:before {
+  content: "\e673";
+}
+
+.icon-groupChat:before {
+  content: "\e602";
+}
+
+.icon-new:before {
+  content: "\e672";
+}
+
+.icon-transfer:before {
+  content: "\e60f";
+}
+
+.icon-material:before {
+  content: "\e671";
+}
+
+.icon-verbal-trick:before {
+  content: "\e66f";
+}
+
+.icon-remove_circle:before {
+  content: "\e66e";
+}
+
+.icon-edit:before {
+  content: "\e66d";
+}
+
+.icon-remove:before {
+  content: "\e670";
+}
+
+.icon-more:before {
+  content: "\e674";
+}
+
+.icon-send:before {
+  content: "\e66c";
+}
+
+.icon-send-white:before {
+  content: "\e66a";
+}
+
+.icon-player:before {
+  content: "\e69b";
+}
+
+.icon-default-video:before {
+  content: "\e668";
+}
+
+.icon-mini-app:before {
+  content: "\e66b";
+}
+
+.icon-pdf:before {
+  content: "\e655";
+}
+
+.icon-unknown:before {
+  content: "\e656";
+}
+
+.icon-ppt:before {
+  content: "\e658";
+}
+
+.icon-psd:before {
+  content: "\e659";
+}
+
+.icon-doc:before {
+  content: "\e65a";
+}
+
+.icon-zip:before {
+  content: "\e65b";
+}
+
+.icon-video:before {
+  content: "\e65c";
+}
+
+.icon-txt:before {
+  content: "\e65d";
+}
+
+.icon-xml:before {
+  content: "\e65e";
+}
+
+.icon-ai:before {
+  content: "\e65f";
+}
+
+.icon-audio:before {
+  content: "\e660";
+}
+
+.icon-csv:before {
+  content: "\e661";
+}
+
+.icon-excel:before {
+  content: "\e662";
+}
+
+.icon-image:before {
+  content: "\e663";
+}
+
+.icon-exe:before {
+  content: "\e664";
+}
+
+.icon-link:before {
+  content: "\e665";
+}
+
+.icon-html:before {
+  content: "\e666";
+}
+
+.icon-mp4:before {
+  content: "\e667";
+}
+
+.icon-img-link:before {
+  content: "\e669";
+}
+

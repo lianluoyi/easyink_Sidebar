@@ -1,0 +1,26 @@
+/* 单行省略 */
+.inoneline {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 单行 flex:1 省略 */
+.inoneline-flex {
+  overflow: hidden;
+  line-height: 18px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+/* 两行省略 */
+.intwoline {
+  overflow: hidden;
+  line-height: 18px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}

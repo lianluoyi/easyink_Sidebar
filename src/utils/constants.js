@@ -268,6 +268,8 @@ export const MATERIAL_TYPE = 'material';
 export const WORDS_TYPE = 'words';
 // 雷达库
 export const RADARS_TYPE = 'radars';
+// 智能表单
+export const FORM_TYPE = 'intelligentForm';
 
 // 时间选择类型
 export const TIME_CHECKED_TYPE = {
@@ -282,3 +284,20 @@ export const NUMBER_UNIT = {
   // eslint-disable-next-line no-magic-numbers
   W: 1e4
 };
+
+// 企业表单
+const ENTERPRISE_FORM = 1;
+// 部门表单
+const DEPARTMENT_FORM = 2;
+// 我的表单
+const PERSONAL_FORM = 3;
+
+// 智能表单的表单tab类型
+export const INTELLIGENT_FORM_TYPE = {
+  'enterprise': ENTERPRISE_FORM,
+  'department': DEPARTMENT_FORM,
+  'personal': PERSONAL_FORM
+};
+
+// 第一页
+export const FIRST_PAGE = 1;

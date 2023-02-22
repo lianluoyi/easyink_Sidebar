@@ -8,3 +8,10 @@ export function listStaff(query) {
     params: query
   });
 }
+// 查询用户详细
+export function getUserInfo(params) {
+  return request({
+    url: '/wecom/user/' + params?.userId,
+    method: 'get'
+  });
+}

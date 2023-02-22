@@ -168,7 +168,6 @@ export default {
   },
   data() {
     return {
-      isRedactFirst: true, // 是不是编辑雷达时第一次自动填入
       behaviorChecked: false, // 行为通知
       trackChecked: false, // 轨迹记录
       tagChecked: false, // 客户标签
@@ -201,19 +200,6 @@ export default {
       if (!val) {
         this.radarTagList = [];
       }
-    },
-    'radarUrlData.isDefined': function(val) {
-      if (!this.isRedactFirst) {
-        this.radarUrlData = {
-          content: '',
-          coverUrl: '',
-          title: '',
-          isDefined: val,
-          url: ''
-        };
-      } else {
-        this.isRedactFirst = false;
-      }
     }
   },
   created() {
@@ -228,14 +214,9 @@ export default {
       .catch((err) => {
         console.log(err);
       });
-
     if (this.radarId) {
       getRadarDetails({ id: this.radarId }).then((res) => {
         const data = res.data;
-        //  如果值和默认值一样，则不会触发'radarUrlData.isDefined'的watch
-        if (data.weRadarUrl.isDefined === this.isDefined) {
-          this.isRedactFirst = false;
-        }
         this.behaviorChecked = data.enableClickNotice;
         this.trackChecked = data.enableBehaviorRecord;
         this.tagChecked = data.enableCustomerTag;
@@ -267,7 +248,8 @@ export default {
         coverUrl: '',
         title: '',
         isDefined: this.radarUrlData.isDefined,
-        url: ''
+        url: '',
+        mediaType: MEDIA_TYPE['IMG_LINK']
       };
     },
     /**
