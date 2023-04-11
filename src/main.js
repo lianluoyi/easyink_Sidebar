@@ -1,8 +1,12 @@
+/*
+ * @Description: Description
+ * @Author: wJiaaa
+ * @LastEditors: wJiaaa
+ */
 import Vue from 'vue';
 import config from '@/config';
 import '@/assets/icon/iconfont.css';
-import { handleTree } from '@/utils/index';
-import { isPC } from '@/utils/index';
+import { isPC, isLock, handleTree, loadScript } from '@/utils/index';
 window.CONFIG = config;
 
 import 'normalize.css/normalize.css';
@@ -21,12 +25,21 @@ import store from './store';
 
 // import VConsole from 'vconsole';
 // process.env.NODE_ENV === 'development' && new VConsole();
-
 Vue.config.productionTip = false;
 Vue.prototype.handleTree = handleTree;
 Vue.prototype.isPC = isPC;
-new Vue({
-  router,
-  store,
-  render: (h) => h(App)
-}).$mount('#app');
+Vue.prototype.isLock = isLock();
+
+const initApp = async() => {
+  if (isLock()) {
+    await loadScript('https://plus-1304809163.cos.ap-guangzhou.myqcloud.com/2023/03/14/V2.13.0/plus-sdk.js', Vue);
+  }
+  Vue.prototype.$api = isLock() ? plusApi : wx;
+  new Vue({
+    router,
+    store,
+    render: (h) => h(App)
+  }).$mount('#app');
+};
+
+initApp();

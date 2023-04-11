@@ -1,7 +1,7 @@
 <!--
  * @Description: 点击详情
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <van-popup :value="radarDetailsIsShow" class="radar-details-page">
@@ -200,10 +200,15 @@ export default {
   mounted() {},
   methods: {
     formatNumber,
-    openChat(externalId) {
-      wx.invoke('openEnterpriseChat', {
+    async openChat(externalId) {
+      let nowActiveWechatInfo;
+      if (this.isLock) {
+        nowActiveWechatInfo = await this.$api.getNowActiveWechat();
+      }
+      this.$api.invoke('openEnterpriseChat', {
         externalUserIds: externalId,
-        groupName: ''
+        groupName: '',
+        ...(this.isLock && { externalUserId: externalId, weComUserId: nowActiveWechatInfo.data.userId, corpId: nowActiveWechatInfo.data.corpId })
       }, function(res) {
       });
     },

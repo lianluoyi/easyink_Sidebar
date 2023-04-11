@@ -107,7 +107,7 @@
             <StepList :step-list="listActivity" />
           </van-tab>
           <van-tab :name="4" title="待办事项" style="margin-bottom:30px" title-class="wait-tab" :badge="todoCount === 0 ? null : todoCount">
-            <StepList :step-list="listBacklog" />
+            <StepList :step-list="listBacklog" class="todo-list" />
             <div class="add-circle" @click="usershow = true">
               <van-icon name="plus" color="#fff" />
             </div>
@@ -220,6 +220,7 @@
       :get-customer-info="portraitType === 'customer' ? getCustomerInfo : getChatInfo"
       :trajectory-type="query.trajectoryType"
       :portrait-type="portraitType"
+      :old-tag="oldTag"
       :old-tag-list="groupInfo ? groupInfo.tagList : []"
     />
 
@@ -301,6 +302,7 @@ export default {
         description: '', // 其他描述
         weTagGroupList: [] // 客户标签合集
       },
+      oldTag: [],
       tagGroups: [], // 标签组
       customerGroupTagGroups: [], // 客户群标签组
       tagActions: [],
@@ -369,11 +371,15 @@ export default {
       duration: 0,
       forbidClick: true
     });
+
     // 获取agentId
     let query = param2Obj(window.location.search);
     const hash = param2Obj(window.location.hash);
     query = Object.assign(query, hash);
     this.agentId = query.agentId;
+    if (this.$store.state.agentConfigStatus && this.isLock) {
+      this.init();
+    }
   },
 
   methods: {
@@ -390,13 +396,13 @@ export default {
     },
     init() {
       const _this = this;
-      wx.invoke('getContext', {}, function(res) {
+      _this.$api.invoke('getContext', {}, function(res) {
         if (res.err_msg === 'getContext:ok') {
           const entry = res.entry; // 返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
           _this.portraitType = entry === 'group_chat_tools' ? 'group' : 'customer';
           switch (_this.portraitType) {
             case 'customer': {
-              wx.invoke('getCurExternalContact', {}, (res) => {
+              _this.$api.invoke('getCurExternalContact', {}, (res) => {
                 if (res.err_msg === 'getCurExternalContact:ok') {
                   _this.externalUserid = res.userId; // 返回当前外部联系人userId
                   // 获取客户信息
@@ -423,7 +429,7 @@ export default {
               break;
             }
             case 'group': {
-              wx.invoke('getCurExternalChat', {}, (res) => {
+              _this.$api.invoke('getCurExternalChat', {}, (res) => {
                 if (res.err_msg === 'getCurExternalChat:ok') {
                   _this.externalUserid = res.chatId; // 返回当前客户群id
                   _this.getChatInfo();
@@ -620,6 +626,11 @@ export default {
       })
         .then(({ data }) => {
           this.form = data;
+          // 初始时设置旧标签列表
+          this.oldTag = [];
+          data.weTagGroupList.forEach(item => {
+            this.oldTag.push(...item.weTags);
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -824,6 +835,11 @@ export default {
 .addwaiting {
   position: relative;
   flex: 1;
+  .todo-list {
+    /deep/ .cover-img {
+    border: none;
+  }
+  }
   .trajectory-tabs {
     height: 100%;
     display: flex;

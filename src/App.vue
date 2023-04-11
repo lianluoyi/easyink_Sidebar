@@ -1,10 +1,12 @@
 <script>
-import { getUserInfo, getCorpInfo, getAgentTicket } from '@/api/common';
-import { param2Obj, isWxWork } from '@/utils/index';
-import { SUCCESS_CODE } from '@/utils/constants';
+import { getUserInfo, getCorpInfo, getAgentTicket, lockToken, getLockApiParams, getServerType } from '@/api/common';
+import { param2Obj, isWxWork, getTicketAndConfig } from '@/utils/index';
+import { SUCCESS_CODE, LOCK_ERROR_MSG, FREQUENT_ERR_MSG } from '@/utils/constants';
 import { setToken } from '@/utils/auth';
+import EmptyDefaultIcon from '@/components/EmptyDefaultIcon.vue';
 import '@/assets/styles/index.less';
 import '@/assets/fonts/iconfont.css';
+import { mapMutations } from 'vuex';
 const TIP_DURATION = 2000;
 
 export default {
@@ -14,86 +16,160 @@ export default {
       reload: this.reload
     };
   },
+  components: { EmptyDefaultIcon },
   data() {
     return {
       corpId: '',
       agentId: '',
-      isRouterAlive: true
+      isRouterAlive: true,
+      showOverLay: false,
+      // 是否是内外部联系人 true 外部
+      isExternal: true
     };
   },
   watch: {
     // 通过config接口注入权限验证配置
     // 所有需要使用JS-SDK的页面必须先注入配置信息，否则将无法调用（同一个url仅需调用一次，对于变化url的SPA（single-page application）的web app可在每次url变化时进行调用）
     $route(route) {
-      // this.wxConfig()
-      const noAuth = route.meta ? route.meta.noAuth : false;
-      !!this.$store.state.userId && !noAuth && this.wxConfig();
+      if (!this.isLock) {
+        const noAuth = route.meta ? route.meta.noAuth : false;
+        !!this.$store.state.userId && !noAuth && this.wxConfig();
+      }
     },
-    '$store.state.userId'(val) {
-      const routeMeta = (this.$router && this.$router.app) ? this.$router.app.$route.meta : null;
-      const noAuth = routeMeta ? routeMeta.noAuth : false;
-      !noAuth && this.wxConfig();
+    '$store.state.userId'() {
+      if (this.isLock) {
+        this.showOverLay = true;
+        this.reload();
+      } else {
+        const routeMeta = (this.$router && this.$router.app) ? this.$router.app.$route.meta : null;
+        const noAuth = routeMeta ? routeMeta.noAuth : false;
+        !noAuth && this.wxConfig();
+      }
     }
+  },
+  destroyed() {
+    window.removeEventListener('message');
   },
   async created() {
-    // console.log('routerbeforeCreate', this.$route);
-    // this.$dialog({ message: 'url' + JSON.stringify(window.location) })
-    let query = param2Obj(window.location.search);
-    const hash = param2Obj(window.location.hash);
+    if (this.isLock) {
+      window.addEventListener('message', (event) => {
+        // 好友变更type为changeNowActiveFriend
+        if (event.data.type === 'realChangeNowActiveFriend') {
+          console.log('--监听到会话窗联系人切换', event.data);
+          this.$dialog.close();
+          this.reload();
+          this.changeRadarDetailsIsShow(false);
+          this.initLockEnv(true);
+        }
+      });
+      this.initLockEnv(false);
+      this.getServerType();
+    } else {
+      // this.$dialog({ message: 'url' + JSON.stringify(window.location) })
+      let query = param2Obj(window.location.search);
+      const hash = param2Obj(window.location.hash);
 
-    query = Object.assign(query, hash);
+      query = Object.assign(query, hash);
 
-    const code = query.code;
-    const corpId = query.state;
-    // 有corpId时缓存到storage里
-    if (corpId && corpId !== 'undefined') {
-      sessionStorage.setItem('appid', corpId);
-    }
-    const location = window.location;
-    const locationUrl = `${location.protocol}//${location.host}${location.pathname}${location.hash}`;
-    this.$router.onReady(() => {
-      const noAuth = this.$router.app.$route.meta
-        ? this.$router.app.$route.meta.noAuth
-        : false;
-
-      if (!code && !noAuth) {
-        const appid = sessionStorage.getItem('appid');
-        window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${
-          appid
-        }&redirect_uri=${encodeURIComponent(
-          locationUrl
-        )}&response_type=code&scope=snsapi_base&state=${appid}#wechat_redirect`;
+      const code = query.code;
+      const corpId = query.state;
+      // 有corpId时缓存到storage里
+      if (corpId && corpId !== 'undefined') {
+        sessionStorage.setItem('appid', corpId);
       }
-    });
-    window.history.pushState(
-      null,
-      '',
-      locationUrl
-    );
-    // 未进行登录授权过
-    if (!code) {
-      return;
-    }
-    // console.log('code --------', code);
-    const infoRes = await this.getCurrentCorpInfo({ code, corpId });
-    if (!infoRes) {
-      this.$toast('获取企微配置异常');
-      return;
-    }
-    // 设置token到cookie
-    setToken(infoRes.data.token);
-    this.agentId = infoRes.agentId;
-    this.corpId = infoRes.corpId;
-    const { data } = await getUserInfo(code, this.agentId);
-    this.$store.state.userId = data.userId;
+      const location = window.location;
+      const locationUrl = `${location.protocol}//${location.host}${location.pathname}${location.hash}`;
+      this.$router.onReady(() => {
+        const noAuth = this.$router.app.$route.meta
+          ? this.$router.app.$route.meta.noAuth
+          : false;
+
+        if (!code && !noAuth) {
+          const appid = sessionStorage.getItem('appid');
+          window.location.href = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${
+            appid
+          }&redirect_uri=${encodeURIComponent(
+            locationUrl
+          )}&response_type=code&scope=snsapi_base&state=${appid}#wechat_redirect`;
+        }
+      });
+      window.history.pushState(
+        null,
+        '',
+        locationUrl
+      );
+      // 未进行登录授权过
+      if (!code) {
+        return;
+      }
+      // console.log('code --------', code);
+      const infoRes = await this.getCurrentCorpInfo({ code, corpId });
+      if (!infoRes) {
+        this.$toast('获取企微配置异常');
+        return;
+      }
+      // 设置token到cookie
+      setToken(infoRes.data.token);
+      this.agentId = infoRes.agentId;
+      this.corpId = infoRes.corpId;
+      const { data } = await getUserInfo(code, this.agentId);
+      this.$store.state.userId = data.userId;
     // this.$toast('userId:' + this.$store.state.userId)
+    }
   },
   methods: {
+    ...mapMutations('radarData', { changeRadarDetailsIsShow: 'changeRadarDetailsIsShow' }),
     reload() {
       this.isRouterAlive = false;
       // 等待dom更新完再显示页面
       this.$nextTick(() => {
+        this.showOverLay = false;
         this.isRouterAlive = true;
+      });
+    },
+    /**
+     * @description 获取服务商类型
+     */
+    getServerType() {
+      getServerType().then((res) => {
+        this.$store.state.serverType = res.data.serverType;
+      });
+    },
+    /**
+     * @description 初始化Lock环境
+     * @param isHasInjection 是否已经注入
+     */
+    async initLockEnv(isHasInjection) {
+      this.isRouterAlive = false;
+      const { appId } = param2Obj(window.location.href);
+      this.$store.state.agentConfigStatus = false;
+      const lockinjectInfo = await getLockApiParams({ appId });
+      try {
+        !isHasInjection && await getTicketAndConfig({ appId, appSecret: lockinjectInfo.data.appSecret, _this: this });
+      } catch (error) {
+        return this.$dialog({ message: 'AppID或AppSecret错误，请重新配置' });
+      }
+      this.$api.getNowActiveWechat().then((res) => {
+        const { corpId, userId, isExternal } = res.data;
+        this.isExternal = isExternal;
+        if (this.isExternal) {
+          this.getLockToken({ corpId, userId }).then((token) => {
+            this.$store.state.userId = userId;
+            this.$store.state.corpId = corpId;
+            this.$store.state.agentConfigStatus = true;
+            sessionStorage.setItem('appid', corpId);
+            setToken(token);
+            this.$nextTick(() => {
+              this.showOverLay = false;
+              this.isRouterAlive = true;
+            });
+          });
+        } else {
+          this.$toast.clear();
+        }
+      }).catch(() => {
+        this.$dialog({ message: LOCK_ERROR_MSG[FREQUENT_ERR_MSG] });
+        this.$toast.clear();
       });
     },
     // 获取企业微信配置
@@ -160,13 +236,23 @@ export default {
       } catch (error) {
         console.error('注入应用失败', error);
       }
+    },
+    async getLockToken(params) {
+      const tokenRes = await lockToken(params);
+      return tokenRes.data?.token;
     }
   }
 };
 </script>
 <template>
   <div id="app">
-    <router-view v-if="isRouterAlive" class="page" />
+    <template v-if="isExternal">
+      <van-overlay :show="showOverLay" @click="show = false">
+        <van-loading type="spinner" vertical style="margin-top: 50%;">加载中...</van-loading>
+      </van-overlay>
+      <router-view v-if="isRouterAlive" class="page" />
+    </template>
+    <EmptyDefaultIcon v-else :length="0" text="内部联系人/群聊暂不支持该功能" class="warn-tip-div customer-warn-tip" :empty-icon="require('@/assets/denyAccess.png')" />
   </div>
 </template>
 

@@ -196,7 +196,7 @@ export default {
       }
       this.btnLoading = true;
       this.loadingIcon = true;
-      wx.invoke('shareToExternalMoments', params, (res) => {
+      this.$api.invoke('shareToExternalMoments', params, (res) => {
         if (res.err_msg !== 'shareToExternalMoments:cancel' && res.err_msg !== 'shareToExternalMoments:ok') {
           toast('发送失败');
           this.btnLoading = false;

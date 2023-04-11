@@ -208,7 +208,9 @@ export default {
             title: '',
             content: '',
             coverUrl: '',
-            isDefined: DEFAULT_LINK
+            isDefined: DEFAULT_LINK,
+            appid: '',
+            accountOriginalId: ''
           });
           break;
         }
@@ -246,7 +248,11 @@ export default {
             return false;
           }
           case MEDIA_TYPE['MINI_APP']: {
-            if (!item.content) {
+            if (!item.accountOriginalId) {
+              this.$toast('请填写小程序账号原始ID');
+              return true;
+            }
+            if (!item.appid) {
               this.$toast('请填写小程序appid');
               return true;
             }

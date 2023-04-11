@@ -1,7 +1,7 @@
 /*
  * @Description: 智能表单接口
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
  */
 import request from '@/utils/request';
 const service = window.CONFIG.services.wecom + '/form';
@@ -52,6 +52,18 @@ export function getFormRecord(params) {
 export function addSendFormRecord(params) {
   return request({
     url: service + '/use/record/add',
+    method: 'get',
+    params
+  });
+}
+
+/**
+ * @description 获取表单链接
+ * @param params
+ */
+export function getSendFormUrl(params) {
+  return request({
+    url: service + '/genFormUrl',
     method: 'get',
     params
   });

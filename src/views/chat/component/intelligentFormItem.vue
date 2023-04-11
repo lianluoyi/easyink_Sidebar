@@ -23,11 +23,13 @@
 <script>
 import { INTELLIGENT_FORM_TYPE, MEDIA_TYPE } from '@/utils/constants';
 import { sendMessage } from '@/utils/index';
-import { addSendFormRecord } from '@/api/form';
+import { addSendFormRecord, getSendFormUrl } from '@/api/form';
 // 侧边栏渠道类型
 const SIDEBAR_CHANNEL_TYPE = 4;
 // 问卷表单icon
 const QUESTIONNAIRE = 'https://easy-1304809163.cos.ap-nanjing.myqcloud.com/questionnaire.png';
+// 第三方应用;
+const SERVER_TYPE_THIRD = 'third';
 export default {
   name: '',
   components: { },
@@ -76,7 +78,12 @@ export default {
      * @param {*} channelType 渠道类型
      * @return {*}
      */
-    getFormUrl(formId, userId, channelType) {
+    async getFormUrl(formId, userId, channelType) {
+      // 当为lock且三方的环境时
+      if (this.isLock && this.$store.state.serverType === SERVER_TYPE_THIRD) {
+        const formUrlRes = await getSendFormUrl({ formId, userId, channelType: +channelType });
+        return formUrlRes.data;
+      }
       return `${this.domainName}?formId=${formId}&userId=${userId}&channelType=${channelType}`;
     },
     /**
@@ -89,10 +96,11 @@ export default {
       const handleFormId = this.isRecent ? formId : id;
       const newData = {
         mediaType: MEDIA_TYPE['IMG_LINK'],
-        materialUrl: this.getFormUrl(handleFormId, userId, SIDEBAR_CHANNEL_TYPE),
+        materialUrl: await this.getFormUrl(handleFormId, userId, SIDEBAR_CHANNEL_TYPE),
         materialName: this.formItem.formName,
         digest: this.formItem.description,
-        coverUrl: this.formItem.headImageurl || QUESTIONNAIRE
+        coverUrl: this.formItem.headImageurl || QUESTIONNAIRE,
+        externalUserId: this.externalUserId
       };
       this.$toast.loading({
         message: '正在发送...',

@@ -108,7 +108,7 @@ export default {
     // 将链接设置到输入框
     setLinkToTextarea(groupCodeUrl, imgUrl, taskName) {
       const toast = this.$toast;
-      wx.invoke(
+      this.$api.invoke(
         'sendChatMessage',
         {
           msgtype: 'news',
@@ -133,7 +133,7 @@ export default {
       const imgUrl = this.imgUrl;
       const setLinkToTextarea = this.setLinkToTextarea;
       const toast = this.$toast;
-      wx.invoke(
+      this.$api.invoke(
         'sendChatMessage',
         {
           msgtype: 'text', // 消息类型，必填

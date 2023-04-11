@@ -75,6 +75,10 @@ function createAxios(baseURL) {
   return instance;
 }
 
-// const httpRequest = createAxios()
+// 第二个代理基础路径配置
+export const instance = axios.create({
+  baseURL: process.env.VUE_APP_BASE_LOCK_API
+});
+instance.defaults.timeout = TIMEOUT;
 
 export default createAxios(process.env.VUE_APP_BASE_API);

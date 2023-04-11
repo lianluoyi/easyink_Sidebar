@@ -86,7 +86,8 @@
       </div>
     </div>
     <div v-else-if="mediaType === MEDIA_TYPE['MINI_APP']" class="upload-content-item">
-      <van-field v-model="item.content" label-width="0" placeholder="必填，请填写与企业关联小程序的appid" />
+      <van-field v-model="item.accountOriginalId" label-width="0" placeholder="必填，请填写与企业关联小程序的账号原始ID" />
+      <van-field v-model="item.appid" label-width="0" placeholder="必填，请填写与企业关联小程序的appid" />
       <van-field v-model="item.url" label-width="0" placeholder="必填，请填写小程序消息打开后的路径，.html后缀" />
       <van-field v-model="item.title" label-width="0" maxlength="32" show-word-limit placeholder="必填，请填写小程序的标题" />
       <div class="upload-btn">

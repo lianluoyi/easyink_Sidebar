@@ -1,7 +1,7 @@
 <!--
  * @Description: 空值缺省图
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 
 <script>
@@ -13,10 +13,10 @@ export default {
   components: {},
   props: {
     /**
-     * 数据大小（为0时显示空值图，不为0时使用传入的节点）
+     * 数据大小（为0或者false时显示空值图，不为0时使用传入的节点）
      */
     length: {
-      type: Number,
+      type: [Number, Boolean],
       default: 0
     },
     /**

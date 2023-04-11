@@ -35,14 +35,7 @@ export function getAllTags(params) {
     params
   });
 }
-// 更新客户画像标签
-export function updateWeCustomerPorTraitTag(data) {
-  return request({
-    url: service + '/updateWeCustomerPorTraitTag',
-    method: 'post',
-    data
-  });
-}
+
 // 查看客户添加的员工
 export function findAddaddEmployes(params) {
   return request({

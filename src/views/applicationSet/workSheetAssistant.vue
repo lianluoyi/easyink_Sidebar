@@ -1,7 +1,7 @@
 <!--
  * @Description: 青鸾智能工单助手界面
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="work-sheet-assistant-page">
@@ -162,7 +162,7 @@ export default {
      */
     checkCustomerType() {
       const _this = this;
-      wx.invoke('getContext', {}, function(res) {
+      this.api.invoke('getContext', {}, function(res) {
         if (res.err_msg === 'getContext:ok') {
           // 返回进入H5页面的入口类型，目前有normal、contact_profile、single_chat_tools、group_chat_tools
           const entry = res.entry;
@@ -179,7 +179,7 @@ export default {
      */
     getGroupInfo() {
       const _this = this;
-      wx.invoke('getCurExternalChat', {}, (res) => {
+      this.api.invoke('getCurExternalChat', {}, (res) => {
         if (res.err_msg === 'getCurExternalChat:ok') {
           // 返回当前客户群id
           _this.externalUsechatrid = res.chatId;

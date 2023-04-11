@@ -1,7 +1,7 @@
 <!--
  * @Description: 移动工具样式
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <van-popover
@@ -10,6 +10,7 @@
     trigger="click"
     class="group-popover"
     :placement="placement"
+    get-container=""
   >
     <template #reference>
       <i class="iconfont icon-more" @click="handleTool" />

@@ -41,6 +41,7 @@ export default {
       default: () => {}
     }
   },
+  inject: ['getExternalUserId'],
   data() {
     return {
       refreshing: false,
@@ -58,10 +59,15 @@ export default {
         '4': '文本',
         '5': '海报'
       },
-      MEDIA_TYPE
+      MEDIA_TYPE,
+      showEmpty: false
     };
   },
   computed: {
+    // 拿到inject的外部联系人id
+    externalUserId() {
+      return this.getExternalUserId();
+    }
   },
   watch: {
     userId(val) {
@@ -71,7 +77,6 @@ export default {
     }
   },
   created() {
-    this.getList(1);
     // this.userId && this.getCollectionList()
   },
   mounted() {
@@ -114,7 +119,7 @@ export default {
         } else {
           this.list.push(...rows);
         }
-
+        this.showEmpty = this.list.length;
         this.loading = false;
         this.refreshing = false;
         // 数据全部加载完成
@@ -141,7 +146,7 @@ export default {
         duration: 0,
         forbidClick: true
       });
-      sendMessage(data, this, getMaterialMediaId);
+      sendMessage({ ...data, externalUserId: this.externalUserId }, this, getMaterialMediaId);
     },
     collect(data) {
       // collection 是否收藏 0未收藏 1 已收藏
@@ -217,7 +222,7 @@ export default {
           }
           // 移动端采用企微api中预览文件的功能
           if (!isPC()) {
-            wx.invoke(
+            this.$api.invoke(
               'previewFile',
               {
                 url: item.materialUrl, // 需要预览文件的地址(必填，可以使用相对路径)
@@ -252,143 +257,146 @@ export default {
         <van-tag v-if="tagItem.tagName" :key="tagItem.id" plain closeable class="green-tag-item search-tag" @close="() => removeTag(tagItem.id)">{{ tagItem.tagName }}</van-tag>
       </template>
     </div>
-    <EmptyDefaultIcon :length="list.length" text="没有找到素材" class="material-list-div">
-      <van-pull-refresh
-        v-model="refreshing"
-        success-text="刷新成功"
-        @refresh="getList(1)"
-      >
-        <van-list
-          v-model="loading"
-          :finished="finished"
-          finished-text="没有更多了"
-          :error.sync="error"
-          error-text="请求失败，点击重新加载"
-          @load="getList()"
+    <!-- 初始化时不展示空状态 在调用过接口后再将列表长度赋值给空组件 避免出现List列表无法初始化调用load -->
+    <EmptyDefaultIcon :length="showEmpty" text="没有找到素材" class="material-list-div">
+      <div class="material-list-div">
+        <van-pull-refresh
+          v-model="refreshing"
+          success-text="刷新成功"
+          @refresh="getList(1)"
         >
-          <div v-for="(item, index) in list" :key="index" class="list">
-            <div class="content bfc-o">
-              <div class="img-div">
-                <!-- 海报 -->
-                <van-image
-                  v-if="item.mediaType == MEDIA_TYPE['POSTER']"
-                  class="poster-cover-img cover-item"
-                  fit="contain"
-                  :src="item.materialUrl"
-                  @click="() => onPreview(item)"
-                />
-                <!-- 视频 -->
-                <div v-if="item.mediaType == MEDIA_TYPE['VIDEO']" class="cover-item">
-                  <div v-if="item.coverUrl" class="video-item">
-                    <van-image
-                      class="video-item"
-                      width="70"
-                      height="70"
-                      :src="item.coverUrl"
-                      @click="() => onPreview(item)"
-                    >
+          <van-list
+            v-model="loading"
+            :finished="finished"
+            finished-text="没有更多了"
+            :error.sync="error"
+            error-text="请求失败，点击重新加载"
+            @load="getList()"
+          >
+            <div v-for="(item, index) in list" :key="index" class="list">
+              <div class="content bfc-o">
+                <div class="img-div">
+                  <!-- 海报 -->
+                  <van-image
+                    v-if="item.mediaType == MEDIA_TYPE['POSTER']"
+                    class="poster-cover-img cover-item"
+                    fit="contain"
+                    :src="item.materialUrl"
+                    @click="() => onPreview(item)"
+                  />
+                  <!-- 视频 -->
+                  <div v-if="item.mediaType == MEDIA_TYPE['VIDEO']" class="cover-item">
+                    <div v-if="item.coverUrl" class="video-item">
+                      <van-image
+                        class="video-item"
+                        width="70"
+                        height="70"
+                        :src="item.coverUrl"
+                        @click="() => onPreview(item)"
+                      >
+                        <svg class="icon-player" :width="25" :height="25">
+                          <use href="#icon-player" />
+                        </svg>
+                        <template slot="error">
+                          <svg class="icon-default-video" :width="25" :height="25">
+                            <use href="#icon-default-video" />
+                          </svg>
+                        </template>
+                      </van-image>
+                    </div>
+                    <div v-else class="video-item" @click="() => onPreview(item)">
                       <svg class="icon-player" :width="25" :height="25">
                         <use href="#icon-player" />
                       </svg>
-                      <template slot="error">
-                        <svg class="icon-default-video" :width="25" :height="25">
-                          <use href="#icon-default-video" />
-                        </svg>
-                      </template>
-                    </van-image>
-                  </div>
-                  <div v-else class="video-item" @click="() => onPreview(item)">
-                    <svg class="icon-player" :width="25" :height="25">
-                      <use href="#icon-player" />
-                    </svg>
-                    <video
-                      id="video"
-                      class="video-preview"
-                      webkit-playsinline="true"
-                      playsinline="true"
-                      :autoplay="false"
-                      preload="auto"
-                      :poster="item.coverUrl"
-                      :src="item.materialUrl"
-                    />
-                  </div>
-                </div>
-                <!-- 文件 -->
-                <div
-                  v-if="item.mediaType == MEDIA_TYPE['FILE']"
-                  :class="'cover-item file-item' + (checkCanCopy(item) ? ' material-copy' : '')"
-                  :data-clipboard-text="item.materialUrl"
-                  @click="() => onPreview(item)"
-                >
-                  <svg class="icon" aria-hidden="true" width="70" height="70">
-                    <use :xlink:href="'#icon-' + getFileIconClass(item)" />
-                  </svg>
-                </div>
-                <!-- 链接 -->
-                <van-image
-                  v-if="item.mediaType == MEDIA_TYPE['IMG_LINK']"
-                  class="cover-item"
-                  width="70"
-                  height="70"
-                  fit="contain"
-                  :src="item.coverUrl"
-                  @click="() => onPreview(item)"
-                >
-                  <template slot="error">
-                    <svg class="icon-img-link" :width="25" :height="25">
-                      <use href="#icon-img-link" />
-                    </svg>
-                  </template>
-                </van-image>
-                <!-- 小程序 -->
-                <van-image
-                  v-if="item.mediaType == MEDIA_TYPE['MINI_APP']"
-                  class="cover-item"
-                  width="70"
-                  height="70"
-                  :src="item.coverUrl"
-                >
-                  <template slot="error">
-                    <div slot="error" class="image-slot">
-                      <i class="iconfont icon-mini-app" style="font-size: 25px" />
+                      <video
+                        id="video"
+                        class="video-preview"
+                        webkit-playsinline="true"
+                        playsinline="true"
+                        :autoplay="false"
+                        preload="auto"
+                        :poster="item.coverUrl"
+                        :src="item.materialUrl"
+                      />
                     </div>
-                  </template>
-                </van-image>
-              </div>
-              <div class="material-info">
-                <div v-if="checkCanCopy(item)" class="title line2-toe material-copy" :data-clipboard-text="item.materialUrl">
-                  {{ item.materialName }}
-                </div>
-                <div v-else class="material-title title line2-toe" @click="() => onPreview(item)">
-                  <span v-if="mediaType === null" class="category-name">{{ categoryObj[item.mediaType] }} | </span>
-                  <span>{{ item.materialName }}</span>
-                </div>
-                <!-- <van-button :data-clipboard-text="item.materialUrl">{{ item.materialName }}</van-button> -->
-                <FileInfo :item="item" />
-                <div class="tag-info">
-                  <template v-for="tagItem in tagList(item)">
-                    <van-tag v-if="tagItem.tagName" :key="tagItem.id" plain class="green-tag-item">{{ tagItem.tagName }}</van-tag>
-                  </template>
-                </div>
-              </div>
-              <div class="tool">
-                <div class="fr flex">
-                  <div class="action" title="发送" @click="send(item)">
-                    <van-image
-                      width="20"
-                      height="20"
-                      :src="require(`@/assets/icon/send-icon.svg`)"
-                    />
                   </div>
-                <!-- <div v-if="!!userId" class="action" @click="collect(item)">
+                  <!-- 文件 -->
+                  <div
+                    v-if="item.mediaType == MEDIA_TYPE['FILE']"
+                    :class="'cover-item file-item' + (checkCanCopy(item) ? ' material-copy' : '')"
+                    :data-clipboard-text="item.materialUrl"
+                    @click="() => onPreview(item)"
+                  >
+                    <svg class="icon" aria-hidden="true" width="70" height="70">
+                      <use :xlink:href="'#icon-' + getFileIconClass(item)" />
+                    </svg>
+                  </div>
+                  <!-- 链接 -->
+                  <van-image
+                    v-if="item.mediaType == MEDIA_TYPE['IMG_LINK']"
+                    class="cover-item"
+                    width="70"
+                    height="70"
+                    fit="contain"
+                    :src="item.coverUrl"
+                    @click="() => onPreview(item)"
+                  >
+                    <template slot="error">
+                      <svg class="icon-img-link" :width="25" :height="25">
+                        <use href="#icon-img-link" />
+                      </svg>
+                    </template>
+                  </van-image>
+                  <!-- 小程序 -->
+                  <van-image
+                    v-if="item.mediaType == MEDIA_TYPE['MINI_APP']"
+                    class="cover-item"
+                    width="70"
+                    height="70"
+                    :src="item.coverUrl"
+                  >
+                    <template slot="error">
+                      <div slot="error" class="image-slot">
+                        <i class="iconfont icon-mini-app" style="font-size: 25px" />
+                      </div>
+                    </template>
+                  </van-image>
+                </div>
+                <div class="material-info">
+                  <div v-if="checkCanCopy(item)" class="title line2-toe material-copy" :data-clipboard-text="item.materialUrl">
+                    {{ item.materialName }}
+                  </div>
+                  <div v-else class="material-title title line2-toe" @click="() => onPreview(item)">
+                    <span v-if="mediaType === null" class="category-name">{{ categoryObj[item.mediaType] }} | </span>
+                    <span>{{ item.materialName }}</span>
+                  </div>
+                  <!-- <van-button :data-clipboard-text="item.materialUrl">{{ item.materialName }}</van-button> -->
+                  <FileInfo :item="item" />
+                  <div class="tag-info">
+                    <template v-for="tagItem in tagList(item)">
+                      <van-tag v-if="tagItem.tagName" :key="tagItem.id" plain class="green-tag-item">{{ tagItem.tagName }}</van-tag>
+                    </template>
+                  </div>
+                </div>
+                <div class="tool">
+                  <div class="fr flex">
+                    <div class="action" title="发送" @click="send(item)">
+                      <van-image
+                        width="20"
+                        height="20"
+                        :src="require(`@/assets/icon/send-icon.svg`)"
+                      />
+                    </div>
+                  <!-- <div v-if="!!userId" class="action" @click="collect(item)">
                     {{ item.collection == 1 ? '取消' : '' }}收藏
                   </div> -->
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </van-list>
-      </van-pull-refresh>
+          </van-list>
+        </van-pull-refresh>
+      </div>
     </EmptyDefaultIcon>
   </div>
 </template>
@@ -403,7 +411,6 @@ export default {
   }
   .material-list-div {
     flex: 1;
-    overflow: auto;
   }
 }
 .content {

@@ -37,6 +37,14 @@ module.exports = {
         // pathRewrite: {
         //   ['^' + process.env.VUE_APP_BASE_API]: ''
         // }
+      },
+      'lock': {
+        target: process.env.VUE_APP_BASE_LOCK_API,
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/lock': ''
+        }
       }
     },
     disableHostCheck: true

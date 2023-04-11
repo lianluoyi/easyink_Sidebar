@@ -17,7 +17,8 @@ export default new Vuex.Store({
     userId: '',
     agentConfigStatus: false,
     // 企业ID
-    corpId: ''
+    corpId: '',
+    serverType: ''
   },
   modules: {
     materialInfo,
