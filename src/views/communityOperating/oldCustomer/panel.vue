@@ -175,7 +175,7 @@ export default {
       const welcomeMsg = this.task.welcomeMsg;
       const groupCodeUrl = this.groupCodeUrl;
       const _this = this;
-      wx.invoke('shareToExternalContact', {
+      this.$api.invoke('shareToExternalContact', {
         text: {
           content: welcomeMsg // 回填到分享框的文本内容
         },

@@ -1,7 +1,7 @@
 <!--
  * @Description: 每个雷达item
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="radar-item">
@@ -63,8 +63,13 @@ export default {
   computed: {
     ...mapState('radarData', {
       radarDetailsIsShow: (state) => state.radarDetailsIsShow
-    })
+    }),
+    // 拿到inject的外部联系人id
+    externalUserId() {
+      return this.getExternalUserId();
+    }
   },
+  inject: ['getExternalUserId'],
   methods: {
     async handleSendAll() {
       this.$toast.loading({
@@ -82,6 +87,7 @@ export default {
       const sendRes = await getRadarShortUrl({ radarId, userId: this.$store.state.userId });
       sendMessage({
         ...sendObj,
+        externalUserId: this.externalUserId,
         materialUrl: sendRes?.data?.url
       }, this);
     },

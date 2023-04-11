@@ -2,7 +2,6 @@ import request from '@/utils/request';
 import config from '@/config';
 const service = config.services.wecom;
 const commonService = config.services.common;
-
 /**
  * 获取应用的jsapi_ticket
  * @param {*} url 页面url
@@ -69,6 +68,36 @@ export function uploadFile2Cos(data) {
 export function getInfo() {
   return request({
     url: '/getInfo',
+    method: 'get'
+  });
+}
+/**
+ * @description 获取登录token
+ */
+export function lockToken(params) {
+  return request({
+    url: '/lockToken',
+    method: 'get',
+    params
+  });
+}
+
+/**
+ * @description 获取lockApi appid和appsecret
+ */
+export function getLockApiParams(params) {
+  return request({
+    url: service + '/lockSideBar/get',
+    params
+  });
+}
+
+/**
+ * 获取当前服务器类型：是否三方
+ */
+export function getServerType() {
+  return request({
+    url: service + '/3rdapp/getServerType',
     method: 'get'
   });
 }

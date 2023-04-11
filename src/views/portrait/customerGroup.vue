@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户群界面
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: Xzz
 -->
 <template>
   <div class="customer-group-page">
@@ -51,7 +51,7 @@
         @change="findTrajectory()"
       >
         <van-tab :name="4" title="待办事项" title-class="wait-tab" :badge="todoCount === 0 ? null : todoCount">
-          <StepList :step-list="listBacklog" />
+          <StepList :step-list="listBacklog" class="todo-list" />
         </van-tab>
       </van-tabs>
     </div>
@@ -159,5 +159,14 @@ export default {
             }
         }
     }
+    .addwaiting{
+      .todo-list{
+          /deep/ .cover-img {
+              border: none;
+          }
+        }
+
+    }
+
 }
 </style>

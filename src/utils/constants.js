@@ -1,7 +1,7 @@
 /*
  * @Description: 公共常量
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
  */
 
 // 接口请求成功状态码
@@ -301,3 +301,8 @@ export const INTELLIGENT_FORM_TYPE = {
 
 // 第一页
 export const FIRST_PAGE = 1;
+
+export const FREQUENT_ERR_MSG = 'operation too frequently';
+export const LOCK_ERROR_MSG = {
+  [FREQUENT_ERR_MSG]: '操作过于频繁'
+};

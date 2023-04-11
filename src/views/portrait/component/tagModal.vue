@@ -1,7 +1,7 @@
 <!--
  * @Description: 客户/客户群标签弹窗
  * @Author: broccoli
- * @LastEditors: xulinbin
+ * @LastEditors: Xzz
 -->
 <template>
   <!-- 点击客户标签里的编辑触发弹出框开始 -->
@@ -48,13 +48,14 @@
             </div>
           </div>
         </div>
+        <div class="footer-div" />
       </div>
     </div>
     <van-button
       class="saveinfo"
       round
       @click="saveInfo"
-    >保存</van-button>
+    >确认</van-button>
   </van-action-sheet>
   <!-- 点击客户标签里的编辑触发弹出框结束 -->
 </template>
@@ -86,6 +87,13 @@ export default {
       type: Array,
       default: () => []
     },
+    /**
+     * 原选中的标签
+     */
+    radarTagList: {
+      type: Array,
+      default: () => []
+    },
     externalUserid: {
       type: String,
       default: ''
@@ -110,6 +118,10 @@ export default {
       default: 'customer'
     },
     oldTagList: {
+      type: Array,
+      default: () => []
+    },
+    oldTag: {
       type: Array,
       default: () => []
     },
@@ -140,6 +152,27 @@ export default {
   created() {},
   mounted() {},
   methods: {
+    /**
+     * 新旧标签对比
+     */
+    filterTag(oldlist, newlist) {
+      const addList = [];
+      const deleteList = [];
+      newlist.forEach(item => {
+        if (oldlist.findIndex(olditem => olditem.tagId === item.tagId) === -1) {
+          addList.push(item);
+        }
+      });
+      oldlist.forEach(item => {
+        if (newlist.findIndex(newitem => newitem.tagId === item.tagId) === -1) {
+          deleteList.push(item);
+        }
+      });
+      return {
+        addList,
+        deleteList
+      };
+    },
     changeSelectGroup(group) {
       this.selectedGroupName = group.value;
     },
@@ -186,17 +219,19 @@ export default {
     saveInfo() {
       if (this.isRadar) {
         this.$emit('update:addTag', this.addTag);
+        this.$emit('update:radarTagList', Object.assign([], this.addTag));
         this.Pshow = false;
-        this.addTag = [];
         return;
       }
       switch (this.portraitType) {
         case 'customer': {
+          const { addList, deleteList } = this.filterTag(this.oldTag, this.addTag);
           // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
           updateCustomerDetail({
             externalUserid: this.externalUserid,
             userId: this.userId,
-            editTag: this.addTag
+            removeTags: deleteList,
+            addTags: addList
           })
             .then((res) => {
               this.Pshow = false;
@@ -299,14 +334,19 @@ export default {
   overflow: auto;
   height: 60vh;
 }
+.footer-div{
+  height: 50px;
+}
 .saveinfo {
-  width: 90%;
+  position: fixed;
+  width: 80%;
   height: 30px;
   left: 50%;
   bottom: -7px;
   transform: translate(-50%, -50%);
   background-color: @green;
   color: #fff;
+  // bottom: 5px;
 }
 // 客户标签
 .labelstyle {

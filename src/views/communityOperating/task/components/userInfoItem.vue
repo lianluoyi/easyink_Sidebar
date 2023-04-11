@@ -75,7 +75,7 @@ export default {
     openChat() {
       if (this.item.isCustomer) {
         const _this = this;
-        wx.invoke('openEnterpriseChat', {
+        _this.$api.invoke('openEnterpriseChat', {
           externalUserIds: this.item.targetId,
           groupName: this.item.targetUserName
         }, function(res) {

@@ -1,6 +1,7 @@
-import { ICON_LIST, MEDIA_TYPE, DEFAULT_IMG, WX_TYPE, CORP_TYPE, TWO_DIGITS, MS_TO_SECONDS, NUMBER_UNIT } from './constants';
+import { ICON_LIST, MEDIA_TYPE, DEFAULT_IMG, WX_TYPE, CORP_TYPE, TWO_DIGITS, MS_TO_SECONDS, NUMBER_UNIT, FREQUENT_ERR_MSG, LOCK_ERROR_MSG } from './constants';
 import moment from 'moment';
-
+import md5 from 'js-md5';
+import { instance } from '@/utils/request';
 const MAX_BYTE = 1024;
 /**
  * query请求路径参数转为对象
@@ -16,11 +17,11 @@ export function param2Obj(url) {
   }
   return JSON.parse(
     '{"' +
-      search
-        .replace(/"/g, '\\"')
-        .replace(/&/g, '","')
-        .replace(/=/g, '":"') +
-      '"}'
+    search
+      .replace(/"/g, '\\"')
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"') +
+    '"}'
   );
 }
 
@@ -162,7 +163,7 @@ export function dealAllDeviceDownload(url, name, size, _this) {
   }
   // 移动端采用企微api中预览文件的功能
   if (!isPC()) {
-    wx.invoke(
+    _this.$api.invoke(
       'previewFile',
       {
         url: url, // 需要预览文件的地址(必填，可以使用相对路径)
@@ -357,7 +358,7 @@ function dealOverSizeVideo(mes, data, msgtype) {
  * @param {*} enterChat 为true时表示发送完成之后顺便进入会话，仅移动端3.1.10及以上版本支持该字段
  * @returns
  */
-export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterChat = false) {
+export function sendMessage(data, _this, getMaterialMediaId = () => { }, enterChat = false) {
   return new Promise((resolve, reject) => {
     let flag = false;
     let entry;
@@ -365,7 +366,8 @@ export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterCha
     // 未配置客户联系权限
     const UN_PERMISSION_TIP_MAC = 'sendChatMessage:permission denied';
     const UN_PERMISSION_TIP_WIN = 'fail_no permission';
-    wx.invoke('getContext', {}, async function(res) {
+    // eslint-disable-next-line complexity
+    _this.$api.invoke('getContext', {}, async function(res) {
       if (res.err_msg === 'getContext:ok') {
         entry = res.entry; // 返回进入H5页面的入口类型，目前 contact_profile、single_chat_tools、group_chat_tools
         let mes = { enterChat };
@@ -375,7 +377,7 @@ export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterCha
               entry
             )
           ) {
-          // _this.$toast.clear()
+            // _this.$toast.clear()
             _this.$toast('入口错误：' + entry);
             reject('入口错误：' + entry);
             return;
@@ -436,14 +438,14 @@ export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterCha
               break;
             case MEDIA_TYPE['MINI_APP']:
               mes.miniprogram = {
-                appid: data.content, // 小程序的appid
+                appid: data.appid, // 小程序的appid
                 title: data.materialName, // 小程序消息的title
                 imgUrl: data.coverUrl, // 小程序消息的封面图。必须带http或者https协议头，否则报错 $apiName$:fail invalid imgUrl
                 page: data.materialUrl // 小程序消息打开后的路径，注意要以.html作为后缀，否则在微信端打开会提示找不到页面
               };
               break;
           }
-        // _this.$dialog({ message: 'mes：' + JSON.stringify(mes) })
+          // _this.$dialog({ message: 'mes：' + JSON.stringify(mes) })
         } catch (err) {
           _this.$dialog({ message: 'err' + JSON.stringify(err) });
         }
@@ -453,11 +455,11 @@ export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterCha
           reject(`超时抛出${JSON.stringify(mes)}`);
           clearTimeout(timer);
         }, TIME_OUT);
-        wx.invoke('sendChatMessage', mes, function(resSend) {
+        _this.$api.invoke('sendChatMessage', isLock() ? data : mes, function(resSend) {
           clearTimeout(timer);
           if (resSend.err_msg === 'sendChatMessage:ok') {
-          // 发送成功 sdk会自动弹出成功提示，无需再加
-          // _this.$toast('发送成功')
+            // 发送成功 sdk会自动弹出成功提示，无需再加
+            // _this.$toast('发送成功')
             flag = true;
             resolve(resSend);
           } else {
@@ -493,16 +495,21 @@ export function sendMessage(data, _this, getMaterialMediaId = () => {}, enterCha
               return;
             }
             _this.$toast.fail('发送失败');
-          // 错误处理
-          // _this.$dialog({ message: '发送失败：' + JSON.stringify(resSend) })
+            // 错误处理
+            // _this.$dialog({ message: '发送失败：' + JSON.stringify(resSend) })
           }
         });
         _this.$toast.clear();
       } else {
         _this.$toast.clear();
         // 错误处理
-        _this.$dialog({ message: '进入失败：' + JSON.stringify(res) });
-        reject('进入失败：' + JSON.stringify(res));
+        if (_this.isLock && res.err_msg === FREQUENT_ERR_MSG) {
+          _this.$dialog({ message: LOCK_ERROR_MSG[FREQUENT_ERR_MSG] });
+          reject(LOCK_ERROR_MSG[FREQUENT_ERR_MSG]);
+        } else {
+          _this.$dialog({ message: '进入失败：' + JSON.stringify(res) });
+          reject('进入失败：' + JSON.stringify(res));
+        }
       }
     });
     return flag;
@@ -714,4 +721,98 @@ export function returnTodayFormat(pattern) {
  */
 export function returnAfterNDayFormat(pattern, n = 1) {
   return moment().add(n, 'd').format(pattern);
+}
+
+/**
+ * @description: 生成随机数
+ * @return {*}
+ */
+// eslint-disable-next-line no-magic-numbers
+function genRandomNum(count = 18) {
+  const t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+  const a = t.length;
+  let nonce = '';
+  for (let i = 0; i < count; i++) {
+    nonce += t.charAt(Math.floor(Math.random() * a));
+  }
+  return nonce;
+}
+
+/**
+ * @description:  获取签名
+ * @param {*} ticket
+ * @param {*} nonce    18位验证码
+ * @param {*} timeStamp 时间戳
+ * @return {*}
+ */
+function getSignature(ticket, nonce, appId, timeStamp) {
+  const headerObj = {
+    timestamp: timeStamp,
+    'app-id': appId,
+    nonce: nonce,
+    ticket: ticket
+  };
+  const headerArr = Object.keys(headerObj).sort();
+
+  let signature = '';
+  headerArr.map((item, index) => {
+    signature += `${index === 0 ? '' : '&'}${item}=${headerObj[item]}`;
+  });
+  signature = md5(signature).toUpperCase();
+  return signature;
+}
+/**
+ * @description 获取ticket并组装注入参数
+ */
+export function getTicketAndConfig({ appId, appSecret, _this }) {
+  return new Promise((resolve, reject) => {
+    instance.get('open_api/getTicket', {
+      params: {
+        appId,
+        appSecret
+      }
+    }).then((res) => {
+      const timeStamp = new Date().getTime();
+      const nonce = genRandomNum();
+      const params = {
+        nonce,
+        timeStamp: timeStamp,
+        appId: appId,
+        ticket: res.data.data,
+        signature: getSignature(res.data.data, nonce, appId, timeStamp),
+        functionList: ['sendFriendChangeNotice']
+      };
+      _this.$api.config(params).then((configRes) => {
+        resolve(configRes);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  });
+}
+/**
+ * @description 判断是否是lock的环境
+ */
+export function isLock() {
+  return param2Obj(window.location.href).type === 'lock';
+}
+
+/**
+ * @description 动态加载js文件
+ */
+export function loadScript(url, _this) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+
+    script.onload = () => {
+      resolve();
+    };
+
+    script.onerror = () => reject(new Error(`Load script  ${url} failed`));
+
+    script.src = url;
+    const head =
+        document.head || document.getElementsByTagName('head')[0]
+      ;(document.body || head).appendChild(script);
+  });
 }

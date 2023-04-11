@@ -1,7 +1,7 @@
 <!--
  * @Description: 添加/编辑雷达页面
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: Xzz
 -->
 <template>
   <van-popup :value="true" class="add-or-readct-radar-page">
@@ -119,7 +119,7 @@
         </van-cell-group>
       </div>
     </div>
-    <TagModal :show.sync="addTagsShow" :tag-groups="tagGroups" :add-tag.sync="radarTagList" :is-radar="true" />
+    <TagModal :tag-actions="tagActions" :show.sync="addTagsShow" :tag-groups="tagGroups" :add-tag.sync="addTag" :radar-tag-list.sync="radarTagList" :is-radar="true" />
     <div class="footer-container">
       <div v-show="[RADAR_TYPE['department'], RADAR_TYPE['enterprise']].includes(type)" class="is-push-div">
         <van-checkbox v-model="noticeChecked" shape="square" :checked-color="ACTIVE_COLOR">发送应用提醒通知员工</van-checkbox>
@@ -166,6 +166,11 @@ export default {
       default: ''
     }
   },
+  provide() {
+    return {
+      findTrajectory: () => {}
+    };
+  },
   data() {
     return {
       behaviorChecked: false, // 行为通知
@@ -173,6 +178,7 @@ export default {
       tagChecked: false, // 客户标签
       noticeChecked: true, // 是否通知员工 默认勾选
       radarTagList: [], // 雷达标签
+      addTag: [], // 新增标签
       radarTitle: '', // 雷达标题
       // 雷达链接实体
       radarUrlData: {
@@ -184,6 +190,7 @@ export default {
         mediaType: MEDIA_TYPE['IMG_LINK']
       },
       tagGroups: [], // 全部的标签
+      tagActions: [],
       addTagsShow: false, // 添加标签弹出框的展示
       MEDIA_TYPE,
       RADAR_TYPE,
@@ -210,6 +217,7 @@ export default {
     getAllTags()
       .then((res) => {
         this.tagGroups = res.data;
+        this.tagActions = [{ text: '所有标签组', value: '', className: 'tag-group-name' }].concat(res.data.map(group => ({ text: group.groupName, value: group.groupName, className: 'tag-group-name' })));
       })
       .catch((err) => {
         console.log(err);
@@ -222,6 +230,7 @@ export default {
         this.tagChecked = data.enableCustomerTag;
         this.noticeChecked = data.enableUpdateNotice;
         this.radarTagList = data.radarTagList;
+        this.addTag = data.radarTagList;
         this.radarTitle = data.radarTitle;
         this.$set(this.radarUrlData, 'isDefined', data.weRadarUrl.isDefined);
         this.$set(this.radarUrlData, 'content', data.weRadarUrl.content);
@@ -237,6 +246,7 @@ export default {
      * @return {*}
      */
     showAddTags() {
+      this.addTag = Object.assign([], this.radarTagList);
       this.addTagsShow = true;
     },
     /**

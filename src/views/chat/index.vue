@@ -1,7 +1,7 @@
 <!--
  * @Description: 主页
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <script>
 import Material from './material.vue';
@@ -34,16 +34,21 @@ export default {
       val && this.init();
     }
   },
+  created() {
+    if (this.$store.state.agentConfigStatus && this.isLock) {
+      this.init();
+    }
+  },
   methods: {
     init() {
       const _this = this;
-      wx.invoke('getContext', {}, function(res) {
+      _this.$api.invoke('getContext', {}, function(res) {
         if (res.err_msg === 'getContext:ok') {
           const entry = res.entry;
           _this.portraitType = entry === 'group_chat_tools' ? 'group' : 'customer';
           switch (_this.portraitType) {
             case 'customer': {
-              wx.invoke('getCurExternalContact', {}, (res) => {
+              _this.$api.invoke('getCurExternalContact', {}, (res) => {
                 if (res.err_msg === 'getCurExternalContact:ok') {
                   _this.externalUserId = res.userId; // 返回当前外部联系人userId
                 }
@@ -51,7 +56,7 @@ export default {
               break;
             }
             case 'group': {
-              wx.invoke('getCurExternalChat', {}, (res) => {
+              _this.$api.invoke('getCurExternalChat', {}, (res) => {
                 if (res.err_msg === 'getCurExternalChat:ok') {
                   _this.externalUserId = res.chatId; // 返回当前客户群id
                 }

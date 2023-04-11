@@ -1,7 +1,7 @@
 <!--
  * @Description: 单个话术内容
  * @Author: broccoli
- * @LastEditors: broccoli
+ * @LastEditors: wJiaaa
 -->
 <template>
   <div class="verbal-trick-item">
@@ -88,6 +88,7 @@ export default {
       showMore: false
     };
   },
+  inject: ['getExternalUserId'],
   computed: {
     showList() {
       const list = [...this.wordItem.weWordsDetailList];
@@ -100,6 +101,10 @@ export default {
     weWordsDetailList() {
       const wordItem = this.wordItem;
       return (wordItem && wordItem.weWordsDetailList) || [];
+    },
+    // 拿到inject的外部联系人id
+    externalUserId() {
+      return this.getExternalUserId();
     }
   },
   created() {},
@@ -156,7 +161,10 @@ export default {
           materialName: sendItem.title,
           digest: sendItem.content,
           content: sendItem.content,
-          coverUrl: sendItem.coverUrl
+          coverUrl: sendItem.coverUrl,
+          appid: sendItem.appid,
+          accountOriginalId: sendItem.accountOriginalId,
+          externalUserId: this.externalUserId
         };
         this.$toast.loading({
           message: '正在发送...',
@@ -180,7 +188,10 @@ export default {
         materialName: item.title,
         digest: item.content,
         content: item.content,
-        coverUrl: item.coverUrl
+        coverUrl: item.coverUrl,
+        appid: item.appid,
+        accountOriginalId: item.accountOriginalId,
+        externalUserId: this.externalUserId
       };
       this.$toast.loading({
         message: '正在发送...',

@@ -1,7 +1,7 @@
 <!--
  * @Description: 雷达item详情
  * @Author: xulinbin
- * @LastEditors: xulinbin
+ * @LastEditors: wJiaaa
 -->
 <template>
   <van-popover
@@ -9,6 +9,7 @@
     v-model="showPopover"
     trigger="click"
     :placement="placement"
+    get-container=".radar-item"
   >
     <template #reference>
       <i class="iconfont icon-more" @click="handleTool" />

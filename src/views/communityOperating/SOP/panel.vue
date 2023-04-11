@@ -185,7 +185,7 @@ export default {
         };
       }
       if (newPic.length > 0) params['attachments'] = newPic;
-      wx.invoke('shareToExternalChat', params, function(res) {
+      this.$api.invoke('shareToExternalChat', params, function(res) {
         if (res.err_msg === 'shareToExternalChat:ok') {
           console.log(res);
           changeStatus(userId, taskId, 1).then(() => {
