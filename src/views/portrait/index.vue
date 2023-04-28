@@ -263,7 +263,8 @@ export default {
     return {
       findTrajectory: this.findTrajectory,
       changeListVal: this.changeListVal,
-      removeCount: this.removeCount
+      removeCount: this.removeCount,
+      getExternalUserId: () => this.externalUserid
     };
   },
   data() {
