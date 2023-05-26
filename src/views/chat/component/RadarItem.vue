@@ -88,6 +88,8 @@ export default {
       sendMessage({
         ...sendObj,
         externalUserId: this.externalUserId,
+        weComUserId: this.$store.state.userId,
+        corpId: this.$store.state.corpId,
         materialUrl: sendRes?.data?.url
       }, this);
     },

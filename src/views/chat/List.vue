@@ -146,7 +146,7 @@ export default {
         duration: 0,
         forbidClick: true
       });
-      sendMessage({ ...data, externalUserId: this.externalUserId }, this, getMaterialMediaId);
+      sendMessage({ ...data, externalUserId: this.externalUserId, weComUserId: this.$store.state.userId, corpId: this.$store.state.corpId }, this, getMaterialMediaId);
     },
     collect(data) {
       // collection 是否收藏 0未收藏 1 已收藏

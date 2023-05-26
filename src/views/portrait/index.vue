@@ -477,7 +477,7 @@ export default {
           pageSize: PAGE_SIZE,
           externalUserid: this.externalUserid
         };
-        if (this.query.trajectoryType === TRAJECTORY_TYPE['backlog']) query.userId = this.userId;
+        if (this.query.trajectoryType !== TRAJECTORY_TYPE['activity'] && this.portraitType !== 'group') query.userId = this.userId;
         Object.assign(query, this.query);
         page && (query.page = page);
         findTrajectory(query)

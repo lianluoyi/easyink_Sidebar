@@ -147,35 +147,53 @@ export default {
     sleep(time) {
       return new Promise(res => setTimeout(res, time));
     },
+    getSendItemInfo(sendItem) {
+      return {
+        mediaType: sendItem.mediaType,
+        materialUrl: sendItem.url,
+        materialName: sendItem.title,
+        digest: sendItem.content,
+        content: sendItem.content,
+        coverUrl: sendItem.coverUrl,
+        appid: sendItem.appid,
+        accountOriginalId: sendItem.accountOriginalId
+      };
+    },
     /**
      * 发送整个话术分组
      */
     async handleSendAll() {
       const count = this.wordItem.weWordsDetailList && this.wordItem.weWordsDetailList.length;
-
-      for (let index = 0; index < count; index++) {
-        const sendItem = this.wordItem.weWordsDetailList[index];
-        const newData = {
-          mediaType: sendItem.mediaType,
-          materialUrl: sendItem.url,
-          materialName: sendItem.title,
-          digest: sendItem.content,
-          content: sendItem.content,
-          coverUrl: sendItem.coverUrl,
-          appid: sendItem.appid,
-          accountOriginalId: sendItem.accountOriginalId,
-          externalUserId: this.externalUserId
-        };
+      if (this.isLock) {
         this.$toast.loading({
           message: '正在发送...',
           duration: 0,
           forbidClick: true
         });
-        // 等待企微发消息方法响应后再调用下一个
-        try {
-          await sendMessage(newData, this, getMaterialMediaId);
-        } catch (e) { console.error(e); }
+        const newData = this.wordItem.weWordsDetailList.map((item) => {
+          return this.getSendItemInfo(item);
+        });
+        await sendMessage({ sendContentList: newData, externalUserId: this.externalUserId,
+          weComUserId: this.$store.state.userId,
+          corpId: this.$store.state.corpId }, this, getMaterialMediaId);
+      } else {
+        for (let index = 0; index < count; index++) {
+          const sendItem = this.wordItem.weWordsDetailList[index];
+          const newData = this.getSendItemInfo(sendItem);
+          this.$toast.loading({
+            message: '正在发送...',
+            duration: 0,
+            forbidClick: true
+          });
+          // 等待企微发消息方法响应后再调用下一个
+          try {
+            await sendMessage({ ...newData, externalUserId: this.externalUserId,
+              weComUserId: this.$store.state.userId,
+              corpId: this.$store.state.corpId }, this, getMaterialMediaId);
+          } catch (e) { console.error(e); }
+        }
       }
+
       this.saveRecentlyUsed([this.wordItem.id]);
     },
     /**
@@ -183,15 +201,10 @@ export default {
      */
     handleSendSingle(item) {
       const newData = {
-        mediaType: item.mediaType,
-        materialUrl: item.url,
-        materialName: item.title,
-        digest: item.content,
-        content: item.content,
-        coverUrl: item.coverUrl,
-        appid: item.appid,
-        accountOriginalId: item.accountOriginalId,
-        externalUserId: this.externalUserId
+        ...this.getSendItemInfo(item),
+        externalUserId: this.externalUserId,
+        weComUserId: this.$store.state.userId,
+        corpId: this.$store.state.corpId
       };
       this.$toast.loading({
         message: '正在发送...',
