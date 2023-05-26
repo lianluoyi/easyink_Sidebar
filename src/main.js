@@ -32,7 +32,7 @@ Vue.prototype.isLock = isLock();
 
 const initApp = async() => {
   if (isLock()) {
-    await loadScript('https://plus-1304809163.cos.ap-guangzhou.myqcloud.com/2023/03/14/V2.13.0/plus-sdk.js', Vue);
+    await loadScript('https://plus-1304809163.cos.ap-guangzhou.myqcloud.com/config/2023-04-14-V2.14.0-plus-sdk.js', Vue);
   }
   Vue.prototype.$api = isLock() ? plusApi : wx;
   new Vue({

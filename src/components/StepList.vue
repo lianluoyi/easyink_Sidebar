@@ -73,7 +73,7 @@
                   <!-- 活动轨迹 -->
                   <template v-if="item1.trajectoryType == TRAJECTORY_TYPE['activity']">
                     <template v-if="[ADD_USER, DEL_USER].includes(item1.subType)">
-                      <div v-html="dealActivity(item1)" />
+                      <div class="flex aic" v-html="dealActivity(item1)" />
                     </template>
                     <span v-else class="text-span">{{ item1.content }}</span>
                   </template>
@@ -154,7 +154,7 @@ export default {
       });
       //   console.log(this.oldele);
       // oldele为对应轨迹列表的createDate，并进行去重
-      this.oldele = this.newArr(this.oldele).sort(this.f);
+      this.oldele = this.newArr(this.oldele);
       // 按照日期相同的把对应的列表进行分组
       for (let i = 0; i < this.oldele.length; i++) {
         for (let j = 0; j < newVal.length; j++) {
@@ -162,7 +162,6 @@ export default {
             this.nlist.push(newVal[j]);
           }
         }
-        this.nlist = this.nlist.sort(this.sortTime);
 
         // 为了复用 VerbalTrickItem 组件
         this.nlist.forEach(nItem => {
@@ -232,22 +231,6 @@ export default {
     //   数组去重
     newArr(arr) {
       return Array.from(new Set(arr));
-    },
-    // 数组由大到小排序
-    f(a, b) {
-      // 排序函数
-      return -(a - b); // 取反并返回比较参数
-    },
-    /**
-     * 将日期时间按从大到小排序
-     */
-    sortTime(a, b) {
-      // 由于苹果浏览器转换时间异常，需要替换成'/'的格式才可以成功转换
-      const aCreateDate = a.createDate && a.createDate.replace(/-/g, '/');
-      const bCreateDate = b.createDate && b.createDate.replace(/-/g, '/');
-      const aTime = `${aCreateDate} ${a.startTime}`;
-      const bTime = `${bCreateDate} ${b.startTime}`;
-      return new Date(bTime).getTime() - new Date(aTime).getTime();
     },
     // 时间处理器
     getTime(data) {
@@ -335,7 +318,7 @@ export default {
      */
     dealActivity(item) {
       let showHtml = item.content || '';
-      showHtml = showHtml.replace('${picUrl}', `<img style="height:20px; width:20px; fit:cover; margin: 0 5px;" src=${item.detail} />`);
+      showHtml = showHtml.replace('${picUrl}', item.detail ? `<img style="height:20px; width:20px; fit:cover; margin: 0 5px;" src=${item.detail} />` : `<i style="margin:0 5px;color:#A9A9A9;font-size:20px" class='iconfont icon-card-avatar'></i>`);
       return showHtml;
     }
   }

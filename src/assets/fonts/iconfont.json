@@ -6,18 +6,25 @@
   "description": "easyWecom的侧边栏",
   "glyphs": [
     {
+      "icon_id": "35516936",
+      "name": "card-avatar",
+      "font_class": "card-avatar",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "33808350",
+      "name": "问卷任务",
+      "font_class": "questionnaire",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
       "icon_id": "33774885",
       "name": "智能表单菜单",
       "font_class": "formMenu",
       "unicode": "e601",
       "unicode_decimal": 58881
-    },
-    {
-      "icon_id": "33774886",
-      "name": "问卷任务",
-      "font_class": "questionnaire",
-      "unicode": "e603",
-      "unicode_decimal": 58883
     },
     {
       "icon_id": "33774176",

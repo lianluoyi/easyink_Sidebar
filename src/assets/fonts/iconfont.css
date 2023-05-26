@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2881475 */
-  src: url('iconfont.woff2?t=1673763487230') format('woff2'),
-       url('iconfont.woff?t=1673763487230') format('woff'),
-       url('iconfont.ttf?t=1673763487230') format('truetype');
+  src: url('iconfont.woff2?t=1684142309657') format('woff2'),
+       url('iconfont.woff?t=1684142309657') format('woff'),
+       url('iconfont.ttf?t=1684142309657') format('truetype');
 }
 
 .iconfont {
@@ -13,12 +13,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-formMenu:before {
-  content: "\e601";
+.icon-card-avatar:before {
+  content: "\e610";
 }
 
 .icon-questionnaire:before {
-  content: "\e603";
+  content: "\e604";
+}
+
+.icon-formMenu:before {
+  content: "\e601";
 }
 
 .icon-form-menu:before {

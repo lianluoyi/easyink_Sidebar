@@ -100,7 +100,9 @@ export default {
         materialName: this.formItem.formName,
         digest: this.formItem.description,
         coverUrl: this.formItem.headImageurl || QUESTIONNAIRE,
-        externalUserId: this.externalUserId
+        externalUserId: this.externalUserId,
+        weComUserId: this.$store.state.userId,
+        corpId: this.$store.state.corpId
       };
       this.$toast.loading({
         message: '正在发送...',
