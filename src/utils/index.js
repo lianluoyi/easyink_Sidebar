@@ -351,6 +351,18 @@ function dealOverSizeVideo(mes, data, msgtype) {
   return newMes;
 }
 /**
+ * @description 修改发送url
+ */
+function changeSendUrl(item, _this) {
+  if ((item.mediaType === MEDIA_TYPE['IMG_LINK'] || item.mediaType === MEDIA_TYPE['MINI_APP']) && item.coverUrl?.startsWith('/profile')) {
+    item.coverUrl = window.location.origin + item.coverUrl;
+  }
+  if (_this.isLock && [MEDIA_TYPE['POSTER'], MEDIA_TYPE['VIDEO'], MEDIA_TYPE['FILE']].includes(item.mediaType) && item.materialUrl?.startsWith('/profile')) {
+    item.materialUrl = window.location.origin + item.materialUrl;
+  }
+  return item;
+}
+/**
  * 调用企微jsapi进行发消息
  * @param {*} data 消息内容
  * @param {*} _this
@@ -359,6 +371,13 @@ function dealOverSizeVideo(mes, data, msgtype) {
  * @returns
  */
 export function sendMessage(data, _this, getMaterialMediaId = () => { }, enterChat = false) {
+  if (Array.isArray(data.sendContentList)) {
+    data.sendContentList = data.sendContentList.map((k) => {
+      return changeSendUrl(k, _this);
+    });
+  } else {
+    data = changeSendUrl(data, _this);
+  }
   return new Promise((resolve, reject) => {
     let flag = false;
     let entry;
@@ -385,65 +404,66 @@ export function sendMessage(data, _this, getMaterialMediaId = () => { }, enterCh
 
           // mediaType 0 图片（image）、1 语音（voice）、2 视频（video），3 普通文件(file) 4 文本 5 海报
           // msgtype 文本(“text”)，图片(“image”)，视频(“video”)，文件(“file”)，H5(“news”）和小程序(“miniprogram”)
-
-          const msgtype = {
-            [MEDIA_TYPE['POSTER']]: 'image',
-            [MEDIA_TYPE['VIDEO']]: 'video',
-            [MEDIA_TYPE['FILE']]: 'file',
-            [MEDIA_TYPE['IMG_LINK']]: 'news',
-            [MEDIA_TYPE['MINI_APP']]: 'miniprogram',
-            [MEDIA_TYPE['TEXT']]: 'text'
-          };
-          mes.msgtype = msgtype[data.mediaType];
-          switch (data.mediaType) {
-            case MEDIA_TYPE['TEXT']:
-              mes.text = {
-                content: data.content // 文本内容
-              };
-              break;
-            case MEDIA_TYPE['POSTER']:
-            case MEDIA_TYPE['VIDEO']:
-            case MEDIA_TYPE['FILE']: {
-              const dataMediaId = {
-                url: data.materialUrl,
-                type: msgtype[data.mediaType],
-                name: data.materialName
-              };
-
-              const fileSize = data.content / MAX_BYTE / MAX_BYTE;
-              // 视频大于10M则以图文链接形式发出
-              if (data.mediaType === MEDIA_TYPE['VIDEO'] && fileSize > VIDEO_MAX_SIZE) {
-                mes = dealOverSizeVideo(mes, data, msgtype);
-              } else {
-                const resMaterialId = await getMaterialMediaId(dataMediaId);
-                if (!resMaterialId.data) {
-                  _this.$toast('获取素材id失败');
-                  reject('获取素材id失败');
-                  return;
-                }
-                mes[msgtype[data.mediaType]] = {
-                  mediaid: resMaterialId.data.media_id //
+          if (!_this.isLock) {
+            const msgtype = {
+              [MEDIA_TYPE['POSTER']]: 'image',
+              [MEDIA_TYPE['VIDEO']]: 'video',
+              [MEDIA_TYPE['FILE']]: 'file',
+              [MEDIA_TYPE['IMG_LINK']]: 'news',
+              [MEDIA_TYPE['MINI_APP']]: 'miniprogram',
+              [MEDIA_TYPE['TEXT']]: 'text'
+            };
+            mes.msgtype = msgtype[data.mediaType];
+            switch (data.mediaType) {
+              case MEDIA_TYPE['TEXT']:
+                mes.text = {
+                  content: data.content // 文本内容
                 };
+                break;
+              case MEDIA_TYPE['POSTER']:
+              case MEDIA_TYPE['VIDEO']:
+              case MEDIA_TYPE['FILE']: {
+                const dataMediaId = {
+                  url: data.materialUrl,
+                  type: msgtype[data.mediaType],
+                  name: data.materialName
+                };
+
+                const fileSize = data.content / MAX_BYTE / MAX_BYTE;
+                // 视频大于10M则以图文链接形式发出
+                if (data.mediaType === MEDIA_TYPE['VIDEO'] && fileSize > VIDEO_MAX_SIZE) {
+                  mes = dealOverSizeVideo(mes, data, msgtype);
+                } else {
+                  const resMaterialId = await getMaterialMediaId(dataMediaId);
+                  if (!resMaterialId.data) {
+                    _this.$toast('获取素材id失败');
+                    reject('获取素材id失败');
+                    return;
+                  }
+                  mes[msgtype[data.mediaType]] = {
+                    mediaid: resMaterialId.data.media_id //
+                  };
+                }
+                break;
               }
-              break;
+              case MEDIA_TYPE['IMG_LINK']:
+                mes.news = {
+                  link: data.materialUrl, // H5消息页面url 必填
+                  title: data.materialName, // H5消息标题
+                  desc: data.digest, // H5消息摘要
+                  // H5消息封面图片URL
+                  imgUrl: data.coverUrl || DEFAULT_IMG['link']
+                };
+                break;
+              case MEDIA_TYPE['MINI_APP']:
+                mes.miniprogram = {
+                  appid: data.appid, // 小程序的appid
+                  title: data.materialName, // 小程序消息的title
+                  imgUrl: data.coverUrl, // 小程序消息的封面图。必须带http或者https协议头，否则报错 $apiName$:fail invalid imgUrl
+                  page: data.materialUrl // 小程序消息打开后的路径，注意要以.html作为后缀，否则在微信端打开会提示找不到页面
+                };
+                break;
             }
-            case MEDIA_TYPE['IMG_LINK']:
-              mes.news = {
-                link: data.materialUrl, // H5消息页面url 必填
-                title: data.materialName, // H5消息标题
-                desc: data.digest, // H5消息摘要
-                // H5消息封面图片URL
-                imgUrl: data.coverUrl || DEFAULT_IMG['link']
-              };
-              break;
-            case MEDIA_TYPE['MINI_APP']:
-              mes.miniprogram = {
-                appid: data.appid, // 小程序的appid
-                title: data.materialName, // 小程序消息的title
-                imgUrl: data.coverUrl, // 小程序消息的封面图。必须带http或者https协议头，否则报错 $apiName$:fail invalid imgUrl
-                page: data.materialUrl // 小程序消息打开后的路径，注意要以.html作为后缀，否则在微信端打开会提示找不到页面
-              };
-              break;
           }
           // _this.$dialog({ message: 'mes：' + JSON.stringify(mes) })
         } catch (err) {
