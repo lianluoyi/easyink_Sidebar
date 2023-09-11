@@ -1,7 +1,7 @@
 /*
  * @Description: 公共常量
  * @Author: broccoli
- * @LastEditors: wJiaaa
+ * @LastEditors: broccoli
  */
 
 // 接口请求成功状态码
@@ -133,6 +133,7 @@ const ADD_BY_WX_CONTACT = 6;
 const ADD_BY_WX = 7;
 const ADD_BY_THIRD_APP_AUTO = 8;
 const ADD_BY_MAIL = 9;
+const ADD_BY_ASSISTANT = 16;
 const ADD_BY_INTERNAL_SHARE = 201;
 const ADD_BY_ADMIN = 202;
 export const ADD_WAY_MAP = {
@@ -147,7 +148,8 @@ export const ADD_WAY_MAP = {
   [ADD_BY_THIRD_APP_AUTO]: '通过安装第三方应用时自动添加的客服人员添加',
   [ADD_BY_MAIL]: '通过搜索邮箱添加',
   [ADD_BY_INTERNAL_SHARE]: '通过内部成员共享添加',
-  [ADD_BY_ADMIN]: '通过管理员/负责人分配添加'
+  [ADD_BY_ADMIN]: '通过管理员/负责人分配添加',
+  [ADD_BY_ASSISTANT]: '通过获客链接添加'
 };
 
 const SYS_FIELD = 1;
