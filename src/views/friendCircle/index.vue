@@ -197,17 +197,15 @@ export default {
       this.btnLoading = true;
       this.loadingIcon = true;
       this.$api.invoke('shareToExternalMoments', params, (res) => {
+        this.btnLoading = false;
+        this.loadingIcon = false;
         if (res.err_msg !== 'shareToExternalMoments:cancel' && res.err_msg !== 'shareToExternalMoments:ok') {
           toast('发送失败');
-          this.btnLoading = false;
-          this.loadingIcon = false;
         }
-        if (res.err_msg === 'shareToExternalMoments:cancel') {
-          this.btnLoading = false;
-          this.loadingIcon = false;
+        if (res.err_msg === 'shareToExternalMoments:ok') {
+          this.updateUserMoment();
         }
       });
-      this.updateUserMoment();
     },
     // 图片预览
     showImage(item) {

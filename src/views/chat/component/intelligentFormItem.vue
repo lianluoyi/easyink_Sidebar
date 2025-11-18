@@ -23,7 +23,7 @@
 <script>
 import { INTELLIGENT_FORM_TYPE, MEDIA_TYPE } from '@/utils/constants';
 import { sendMessage } from '@/utils/index';
-import { addSendFormRecord, getSendFormUrl } from '@/api/form';
+import { addSendFormRecord, getSendFormUrl, sendFormRecord } from '@/api/form';
 // 侧边栏渠道类型
 const SIDEBAR_CHANNEL_TYPE = 4;
 // 问卷表单icon
@@ -111,6 +111,13 @@ export default {
       });
       try {
         await sendMessage(newData, this);
+        // 发送表单记录
+        await sendFormRecord({
+          formId: handleFormId,
+          userId,
+          externalUserId: this.externalUserId,
+          corpId: this.$store.state.corpId
+        });
       } catch (e) { console.error(e); }
       this.saveRecentlyUsed(handleFormId);
     },

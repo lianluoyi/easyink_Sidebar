@@ -213,6 +213,9 @@
         </template>
       </van-cell>
     </div>
+    <div v-if="CUSTOMER_PROPERTY_VALUE['address'] === item.type">
+      <AddressCell v-model="item.value" :item="item" :district-list="districtList" :api-key="apiKey" />
+    </div>
   </div>
 </template>
 <script>
@@ -220,6 +223,7 @@ import Upload from '@/components/Upload.vue';
 import FileItem from '@/views/chat/component/FileItem.vue';
 import { CUSTOMER_PROPERTY_VALUE, MEDIA_TYPE, UPLOAD_ACCEPT } from '@/utils/constants';
 import { transferTime, parseTime } from '@/utils/index';
+import AddressCell from './addressCell.vue';
 
 const DEFAULT_YEAR = 1990;
 const DEFAULT_DATE = new Date(DEFAULT_YEAR, 0, 1);
@@ -228,7 +232,7 @@ const MIN_YEAR = 1970;
 
 export default {
   name: '',
-  components: { Upload, FileItem },
+  components: { Upload, FileItem, AddressCell },
   props: {
     item: {
       type: Object,
@@ -256,7 +260,15 @@ export default {
       showPicker: false
     };
   },
-  created() {},
+  computed: {
+    districtList() {
+      const list = [...this.$store.state.customerProperty.districtList];
+      return list;
+    },
+    apiKey() {
+      return this.$store.state.customerProperty.apiKey;
+    }
+  },
   mounted() {},
   methods: {
     openCalander(value) {

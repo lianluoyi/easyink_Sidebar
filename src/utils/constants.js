@@ -161,6 +161,7 @@ const SELECT_SINGLE = 6;
 const DATE_FIELD = 7;
 const IMG_FIELD = 8;
 const FILE_FIELD = 9;
+const ADDRESS_FIELD = 10;
 
 // 客户字段类型值
 export const CUSTOMER_PROPERTY_VALUE = {
@@ -172,7 +173,8 @@ export const CUSTOMER_PROPERTY_VALUE = {
   'selectSingle': SELECT_SINGLE,
   'dateField': DATE_FIELD,
   'img': IMG_FIELD,
-  'file': FILE_FIELD
+  'file': FILE_FIELD,
+  'address': ADDRESS_FIELD
 };
 
 export const MS_TO_SECONDS = 1000;
@@ -308,3 +310,7 @@ export const FREQUENT_ERR_MSG = 'operation too frequently';
 export const LOCK_ERROR_MSG = {
   [FREQUENT_ERR_MSG]: '操作过于频繁'
 };
+/** 港澳台 */
+export const SPECIAL_REGION = ['香港特别行政区', '澳门特别行政区', '台湾省'];
+/** 直辖市 */
+export const MUNICIPAL = ['北京市', '天津市', '上海市', '重庆市'];

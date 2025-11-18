@@ -17,7 +17,25 @@
                    CUSTOMER_PROPERTY_VALUE['singleRadio'],
                    CUSTOMER_PROPERTY_VALUE['selectSingle']].includes(item.type)"
           >
-            {{ item.value }}
+            <template v-if="item.name === '电话'">
+              <SensitiveText
+                :key="item.remarkMobilesEncrypt"
+                permission-key="securityConfig:view:phone"
+                :text="item.value"
+                :api-params="{ encryptValue: item.remarkMobilesEncrypt }"
+              />
+            </template>
+            <template v-else-if="item.name === '地址'">
+              <SensitiveText
+                :key="item.addressEncrypt"
+                permission-key="securityConfig:view:address"
+                :text="item.value"
+                :api-params="{ encryptValue: item.addressEncrypt }"
+              />
+            </template>
+            <template v-else>
+              {{ item.value }}
+            </template>
           </div>
           <div
             v-if="CUSTOMER_PROPERTY_VALUE['mulRadio'] === item.type"
@@ -56,13 +74,22 @@
               @click="() => onDownloadFile(fileItem)"
             >{{ fileItem.name }}</div>
           </div>
+          <div v-if="CUSTOMER_PROPERTY_VALUE['address'] === item.type" class="intwoline address-text">
+            <span style="margin-right: 5px;">{{ dealAddressText(item.value) }}</span>
+            <SensitiveText
+              :key="item.value.detailAddressEncrypt"
+              permission-key="securityConfig:view:address"
+              :text="item.value.detailAddress"
+              :api-params="{ encryptValue: item.value.detailAddressEncrypt }"
+            />
+          </div>
         </template>
       </van-cell>
     </van-cell-group>
     <div v-if="enableSideBar" class="transfer-circle" @click="onTransfer">
       <i class="iconfont icon-transfer" />
     </div>
-    <div class="edit-circle" @click="onEdit">
+    <div v-if="checkPermi(['customerManage:customer:edit'])" class="edit-circle" @click="onEdit">
       <i class="iconfont icon-edit" />
     </div>
     <EditCustomerDetail
@@ -79,6 +106,7 @@
   </div>
 </template>
 <script>
+import { checkPermi } from '@/utils/permission';
 import { CUSTOMER_PROPERTY_VALUE } from '@/utils/constants';
 import { getTransferConfig } from '@/api/transfer';
 import { dealShowText, dealAllDeviceDownload, isMac } from '@/utils/index';
@@ -87,10 +115,10 @@ import moment from 'moment';
 import EditCustomerDetail from './editCustomerDetail.vue';
 import TransferCustomer from './transferCustomer';
 import ClipboardJS from 'clipboard';
-
+import SensitiveText from '@/components/SensitiveText.vue';
 export default {
   name: '',
-  components: { EditCustomerDetail, TransferCustomer },
+  components: { EditCustomerDetail, TransferCustomer, SensitiveText },
   props: {
     formData: {
       type: Object,
@@ -144,7 +172,6 @@ export default {
       }
     }
   },
-  created() {},
   mounted() {
     this.clipboard = new ClipboardJS('.customer-file-copy');
     this.clipboard.on('success', (e) => {
@@ -155,6 +182,24 @@ export default {
     });
   },
   methods: {
+    checkPermi(key) {
+      return checkPermi(key);
+    },
+    dealAddressText(value) {
+      if (!value) return '';
+      const { province, city, area, town } = value;
+      if (!province) return '';
+      let text = '';
+      // 对省市区街道去重，避免直辖市重复显示
+      const data = [...new Set([province, city, area, town])];
+      data
+        .filter(item => item !== '暂不选择')
+        .filter(Boolean)
+        .forEach(item => {
+          text += `${item}-`;
+        });
+      return `${text.slice(0, -1)} `;
+    },
     /**
      * 处理所有字段列表数据
      */
@@ -162,6 +207,10 @@ export default {
       const customList = [];
       // 处理自定义字段显示内容
       this.baseCustomPropertyList.map(customItem => {
+        // 客户标签不属于自定义字段
+        if (customItem.name === '客户标签') {
+          return;
+        }
         let newItem = { ...customItem };
         switch (customItem.id) {
           case 'remark': {
@@ -185,10 +234,12 @@ export default {
           }
           case '地址': {
             newItem.value = customerInfo?.address;
+            newItem.addressEncrypt = customerInfo?.addressEncrypt;
             break;
           }
           case '电话': {
             newItem.value = customerInfo.remarkMobiles;
+            newItem.remarkMobilesEncrypt = customerInfo.remarkMobilesEncrypt;
             break;
           }
           case '描述': {
@@ -236,6 +287,15 @@ export default {
           const dealObj = this.dealShowText(customItem, customerInfo, customItem.type === CUSTOMER_PROPERTY_VALUE['img'] ? 'imgFile' : 'fileType');
           newItem = {
             ...newItem,
+            ...dealObj
+          };
+          break;
+        }
+        case CUSTOMER_PROPERTY_VALUE['address']: {
+          const dealObj = this.dealShowText(customItem, customerInfo, 'addressType');
+          newItem = {
+            ...newItem,
+            value: {},
             ...dealObj
           };
           break;

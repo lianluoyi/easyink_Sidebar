@@ -68,3 +68,14 @@ export function getSendFormUrl(params) {
     params
   });
 }
+/**
+ * @description 发送表单记录
+ * @param params
+ */
+export function sendFormRecord(params) {
+  return request({
+    url: service + '/use/record/add/sendFormRecord',
+    method: 'get',
+    params
+  });
+}

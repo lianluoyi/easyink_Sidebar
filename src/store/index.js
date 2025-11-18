@@ -9,7 +9,7 @@ import getters from './getters';
 import materialInfo from './modules/materialInfo';
 import customerProperty from './modules/customerPropertyList';
 import radarData from './modules/radarData';
-
+import user from './modules/user';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -23,7 +23,8 @@ export default new Vuex.Store({
   modules: {
     materialInfo,
     customerProperty,
-    radarData
+    radarData,
+    user
   },
   getters
 });
