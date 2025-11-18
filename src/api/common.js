@@ -101,3 +101,13 @@ export function getServerType() {
     method: 'get'
   });
 }
+/**
+ * @description 解密
+ */
+export function decrypt(data) {
+  return request({
+    url: commonService + '/decrypt',
+    method: 'POST',
+    data
+  });
+}

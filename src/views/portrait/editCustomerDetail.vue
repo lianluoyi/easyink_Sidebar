@@ -8,10 +8,10 @@
         </div>
       </div>
       <div class="content-container">
-        <van-cell-group class="edit-property-list">
+        <van-cell-group class="edit-property-list" :border="false">
           <van-field v-model="formRemark" label="备注" placeholder="请输入备注名" maxlength="20" show-word-limit :border="false" />
           <div v-for="(item, index) in properList" :key="index">
-            <EditCustomerPropertyItem :item.sync="item" :index="index" :proper-list.sync="properList" />
+            <EditCustomerPropertyItem :item="item" :index="index" :proper-list.sync="properList" @update:item="updatePropertyItem(index, $event)" />
           </div>
         </van-cell-group>
       </div>
@@ -24,10 +24,11 @@
   </van-popup>
 </template>
 <script>
-import { CUSTOMER_PROPERTY_VALUE } from '@/utils/constants';
+import { CUSTOMER_PROPERTY_VALUE, MUNICIPAL } from '@/utils/constants';
 import { updateCustomerDetail } from '@/api/customer';
 import { deepClone } from '@/utils/index';
 import { isEqual } from 'lodash';
+import { decrypt } from '@/api/common';
 import EditCustomerPropertyItem from './component/editCustomerPropertyItem.vue';
 
 const fieldObj = {
@@ -46,7 +47,8 @@ const ALL_CUSTOM_TYPE = [
   CUSTOMER_PROPERTY_VALUE['selectSingle'],
   CUSTOMER_PROPERTY_VALUE['dateField'],
   CUSTOMER_PROPERTY_VALUE['img'],
-  CUSTOMER_PROPERTY_VALUE['file']
+  CUSTOMER_PROPERTY_VALUE['file'],
+  CUSTOMER_PROPERTY_VALUE['address']
 ];
 
 export default {
@@ -92,11 +94,62 @@ export default {
       this.properList = [...val];
       this.oldProperList = deepClone(val);
       this.oldRemark = this.remark;
+    },
+    show(val) {
+      if (val) {
+        this.decryptSensitiveFields();
+      }
     }
   },
   created() {},
   mounted() {},
   methods: {
+    /**
+     * 更新属性项
+     */
+    updatePropertyItem(index, item) {
+      this.$set(this.properList, index, item);
+    },
+    /**
+     * 解密敏感字段
+     */
+    async decryptSensitiveFields() {
+      for (let i = 0; i < this.properList.length; i++) {
+        const item = this.properList[i];
+        // 解密电话字段
+        if (item.name === '电话' && item.remarkMobilesEncrypt) {
+          try {
+            const res = await decrypt({ encryptValue: item.remarkMobilesEncrypt });
+            this.$set(this.properList, i, { ...item, value: res.data.decryptValue });
+          } catch (error) {
+            console.error('解密电话失败:', error);
+          }
+        }
+        if (item.name === '地址' && item.addressEncrypt) {
+          try {
+            const res = await decrypt({ encryptValue: item.addressEncrypt });
+            this.$set(this.properList, i, { ...item, value: res.data.decryptValue });
+          } catch (error) {
+            console.error('解密地址失败:', error);
+          }
+        }
+        // 解密地址的详细地址字段
+        if (item.type === CUSTOMER_PROPERTY_VALUE['address'] && item.value?.detailAddressEncrypt) {
+          try {
+            const res = await decrypt({ encryptValue: item.value.detailAddressEncrypt });
+            this.$set(this.properList, i, {
+              ...item,
+              value: {
+                ...item.value,
+                detailAddress: res.data.decryptValue
+              }
+            });
+          } catch (error) {
+            console.error('解密详细地址失败:', error);
+          }
+        }
+      }
+    },
     /**
      * 返回
      */
@@ -146,6 +199,8 @@ export default {
       const requiredIndex = allList.findIndex(item => {
         if ([CUSTOMER_PROPERTY_VALUE['img'], CUSTOMER_PROPERTY_VALUE['file'], CUSTOMER_PROPERTY_VALUE['mulRadio']].includes(item.type)) {
           return item.required && (!item.value?.length && !item?.optionValue?.length);
+        } else if (CUSTOMER_PROPERTY_VALUE['address'] === item.type) {
+          return item.required && !item.value?.province;
         } else {
           return item.required && (!item.value && !item.optionValue);
         }
@@ -153,6 +208,19 @@ export default {
 
       if (requiredIndex > -1) {
         this.$toast(`请填写${allList[requiredIndex].name}`);
+        return;
+      }
+      const phoneValue = allList.find(item => item.name === '电话')?.value;
+      const phoneReg = /^[0-9+-]{5,32}$/;
+      let phoneValid = true;
+      phoneValue?.split(',').forEach((phone) => {
+        if (phone && !phoneReg.test(phone)) {
+          phoneValid = false;
+          return;
+        }
+      });
+      if (!phoneValid) {
+        this.$toast('手机号格式不正确');
         return;
       }
       const params = {};
@@ -170,6 +238,7 @@ export default {
       if (extendProperties.length > 0) params['extendProperties'] = extendProperties;
       this.updateCustomer(params, this.goBack);
     },
+    // eslint-disable-next-line complexity
     dealCustomProperList(item, extendProperties) {
       const newExtendProperties = [...extendProperties];
       if (ALL_CUSTOM_TYPE.includes(item.type)) {
@@ -215,6 +284,28 @@ export default {
                 propertyValue: item.optionValue || null
               });
             }
+            break;
+          }
+          case CUSTOMER_PROPERTY_VALUE['address']: {
+            if (!item.value) {
+              newExtendProperties.push({
+                extendPropertyId: item.id,
+                propertyValue: null
+              });
+              break;
+            }
+            if (item.value.town === '暂不选择') {
+              item.value.town = '';
+            }
+            // 香港、澳门、直辖市，城市为空
+            if (['香港特别行政区', '澳门特别行政区', ...MUNICIPAL].includes(item.value.province)) {
+              item.value.city = '';
+            }
+            newExtendProperties.push({
+              extendPropertyId: item.id,
+              propertyType: item.type,
+              propertyValue: item.value && Object.keys(item.value).length > 0 ? JSON.stringify(item.value) : '{}'
+            });
             break;
           }
           default: {

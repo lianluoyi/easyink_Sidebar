@@ -41,8 +41,13 @@
           <div>{{ form.createTime }}</div>
         </div>
         <!-- 客户标签 -->
-        <div class="detail tag-list-div">
-          <div class="c9" style="padding-top:4px">标签</div>
+        <div v-if="tagProperty?.status" class="detail tag-list-div">
+          <div class="c9" style="padding-top:4px">
+            <span v-if="tagProperty?.required" class="required">
+              *
+            </span>
+            标签
+          </div>
           <div class="tag-list">
             <van-row gutter="10" class="labelstyle">
               <div
@@ -222,6 +227,7 @@
       :portrait-type="portraitType"
       :old-tag="oldTag"
       :old-tag-list="groupInfo ? groupInfo.tagList : []"
+      :required="tagProperty?.required"
     />
 
   </div>
@@ -359,6 +365,9 @@ export default {
      */
     showAge() {
       return this.$store.state.customerProperty?.customerProperList.findIndex(item => item.name === '出生日期') > -1;
+    },
+    tagProperty() {
+      return this.$store.state.customerProperty?.customerProperList.find(item => item.name === '客户标签') || {};
     }
   },
   watch: {
@@ -742,6 +751,9 @@ export default {
   .c9 {
     color: #9c9c9c;
     margin-right: 20px;
+    .required {
+      color: #ee0a24;
+    }
     .gender-icon {
       width: 18px;
       height: 18px;

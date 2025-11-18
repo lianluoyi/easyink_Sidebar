@@ -605,6 +605,12 @@ export function dealShowText(colunmItem, row, type) {
       if (proIndex < 0) return;
       return { value: row.extendProperties[proIndex].propertyValue };
     }
+    case 'addressType': {
+      const proIndex = row.extendProperties.findIndex(item => item.extendPropertyId.toString() === colunmItem.id);
+      if (proIndex < 0) return;
+      const propertyValue = JSON.parse(row.extendProperties[proIndex].propertyValue);
+      return { value: propertyValue };
+    }
   }
 }
 

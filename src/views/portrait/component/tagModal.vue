@@ -128,6 +128,10 @@ export default {
     isRadar: {
       type: Boolean,
       default: false
+    },
+    required: {
+      type: Boolean,
+      default: false
     }
   },
   inject: ['findTrajectory'],
@@ -226,6 +230,10 @@ export default {
       switch (this.portraitType) {
         case 'customer': {
           const { addList, deleteList } = this.filterTag(this.oldTag, this.addTag);
+          if (this.required && !this.addTag.length) {
+            this.$toast('请选择标签');
+            return;
+          }
           // 更新客户画像标签 [{ groupId: this.groupId, name: this.name, tagId: this.tagId }]
           updateCustomerDetail({
             externalUserid: this.externalUserid,

@@ -54,7 +54,7 @@ export default {
     if (this.isLock) {
       window.addEventListener('message', (event) => {
         // 好友变更type为changeNowActiveFriend
-        if (event.data.type === 'realChangeNowActiveFriend') {
+        if (event?.data?.type === 'realChangeNowActiveFriend') {
           console.log('--监听到会话窗联系人切换', event.data);
           this.$dialog.close();
           this.reload();
@@ -114,7 +114,12 @@ export default {
       this.corpId = infoRes.corpId;
       const { data } = await getUserInfo(code, this.agentId);
       this.$store.state.userId = data.userId;
-    // this.$toast('userId:' + this.$store.state.userId)
+      this.$store.dispatch('GetInfo').then(() => {
+        this.$nextTick(() => {
+          this.showOverLay = false;
+          this.isRouterAlive = true;
+        });
+      });
     }
   },
   methods: {
@@ -159,9 +164,11 @@ export default {
             this.$store.state.agentConfigStatus = true;
             sessionStorage.setItem('appid', corpId);
             setToken(token);
-            this.$nextTick(() => {
-              this.showOverLay = false;
-              this.isRouterAlive = true;
+            this.$store.dispatch('GetInfo').then(() => {
+              this.$nextTick(() => {
+                this.showOverLay = false;
+                this.isRouterAlive = true;
+              });
             });
           });
         } else {
